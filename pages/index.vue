@@ -1,0 +1,507 @@
+<script setup lang="ts">
+import { readLinesFromCSV, generateContent } from '@/utils/csvToJson'
+
+definePageMeta({
+    layout: 'slot',
+    layoutTransition: {
+        name: 'layout',
+    },
+})
+
+const columns = [
+    {
+        key: 'HO VA TEN',
+        label: 'Họ và tên',
+        class: 'w-[120px]',
+    },
+    {
+        key: 'SO BAO DANH',
+        label: 'Số báo danh',
+        class: 'w-[100px]',
+    },
+    {
+        key: 'MA DE',
+        label: 'Mã đề',
+        class: 'w-[60px]',
+    },
+    {
+        key: 'DIEM',
+        label: 'Điểm',
+        class: 'w-[120px]',
+    },
+]
+const { $pdfMake } = useNuxtApp()
+
+const isOpen = ref(false)
+const state = reactive({
+    code: undefined,
+    class: undefined,
+    types: undefined,
+    file: undefined,
+    columns: [] as any,
+    excercies: [] as any,
+    students: [] as any,
+    studentActive: undefined as any,
+})
+const page = ref(1)
+const pageCount = 10
+
+const handleChangeFile = (event: any) => {
+    const reader = new FileReader()
+    const file = event.target.files[0]
+    reader.onload = (e: any) => {
+        const csvText = e.target.result
+        const startLineIndex = 0 // Bắt đầu từ dòng 0
+
+        const { jsonData, header } = readLinesFromCSV(csvText, startLineIndex)
+        const colsAdding = header
+            .filter((item) => !!Number(item))
+            .map((item) => ({
+                key: item,
+                label: `Câu ${item}`,
+                class: 'w-[60px]',
+            }))
+        state.columns = [...columns, ...colsAdding]
+        state.excercies = [...jsonData]
+        state.studentActive = state.excercies[0]
+        state.students = state.excercies.map((item: any) => {
+            return {
+                label: `${item['HO VA TEN']}(${item['SO BAO DANH']}) - ${item['MA DE']}`,
+                content: `${item['HO VA TEN']}(${item['SO BAO DANH']}) - ${item['MA DE']}`,
+                value: item,
+            }
+        })
+    }
+    reader.readAsText(file)
+    state.file = file
+}
+
+const rows = computed(() => {
+    const data = state.excercies?.slice(
+        (page.value - 1) * pageCount,
+        page.value * pageCount,
+    )
+    return data
+})
+
+const loadPdf = () => {
+    const pdfMaker = $pdfMake as any
+    pdfMaker.tableLayouts = {
+        custom: {
+            fillColor: function (rowIndex: number) {
+                return rowIndex % 2 !== 0 ? '#00000' : null
+            },
+            hLineColor: '#00000',
+            vLineColor: '#00000',
+            paddingLeft: function () {
+                return 10
+            },
+            paddingRight: function () {
+                return 10
+            },
+        },
+    }
+    // playground requires you to assign document definition to a variable called dd
+    const answer = [{ question: 'Cau 2 la gi', link: 'http://localhost:3000/' }]
+    const content = generateContent(state.studentActive, answer)
+    pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
+        base64ToPDF(
+            base64Data.replace('data:application/pdf;base64,', ''),
+            'test.pdf',
+        )
+    })
+}
+const base64ToPDF = (base64Data: any, fileName: string) => {
+    const byteCharacters = atob(base64Data)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+
+    // Tạo một đường link để tải tệp PDF
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName || 'document.pdf'
+    link.click()
+
+    // Giải phóng URL đối tượng khi đã sử dụng xong
+    URL.revokeObjectURL(url)
+}
+const generateHTMLToPDF = async () => {
+    loadPdf()
+}
+const onMarkStudent = (index: number) => {
+    const student = state.students[index].value
+    state.studentActive = student
+}
+</script>
+
+<template>
+    <div class="flex h-full flex-col gap-3 w-full overflow-y-hidden px-2 py-1">
+        <!-- <div class="w-full bg-white rounded-md flex gap-2">
+            <div class="flex gap-3 flex-1">
+                <UForm
+                    :schema="schema"
+                    :state="state"
+                    class="flex flex-col w-full gap-3"
+                >
+                    <UFormGroup
+                        label="Mã học sinh"
+                        name="class"
+                        eager-validation
+                    >
+                        <UInput
+                            v-model="state.code"
+                            placeholder="Nhập mã học sinh"
+                        />
+                    </UFormGroup>
+                    <UFormGroup
+                        label="Tên học sinh"
+                        name="code"
+                        eager-validation
+                    >
+                        <UInput
+                            v-model="state.code"
+                            placeholder="Nhập tên học sinh"
+                        />
+                    </UFormGroup>
+
+                    <UFormGroup
+                        label="Email học sinh"
+                        name="file"
+                        eager-validation
+                    >
+                        <UInput
+                            v-model="state.code"
+                            placeholder="Nhập email học sinh"
+                        />
+                    </UFormGroup>
+                    <UFormGroup label="Lớp" name="class" eager-validation>
+                        <USelect
+                            v-model="state.class"
+                            placeholder="Lựa chọn lớp"
+                            :options="classes"
+                        />
+                    </UFormGroup>
+                </UForm>
+                <UButton class="h-fit mt-6">Tự động điền</UButton>
+            </div>
+            <div class="flex-1 grid grid-cols-2 gap-4 mt-6">
+                <UCard>
+                    <div
+                        class="flex items-center justify-center gap-4 flex-col"
+                    >
+                        <h2 class="font-medium">SỐ CÂU TRẢ LỜI ĐÚNG</h2>
+                        <svg
+                            width="45"
+                            height="42"
+                            viewBox="0 0 45 42"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M15.6667 22.5833L20.7917 27.3333L29.3333 16.25M43 21C43 23.6775 41.5659 26.0445 39.3707 27.4772C39.8295 29.9287 39.0377 32.5419 36.9952 34.435C34.9527 36.328 32.1332 37.0619 29.4883 36.6367C27.9424 38.671 25.3887 40 22.5 40C19.6114 40 17.0578 38.6711 15.5119 36.6369C12.8665 37.0626 10.0464 36.3287 8.00355 34.4354C5.96074 32.5421 5.16895 29.9283 5.62818 27.4765C3.43365 26.0437 2 23.677 2 21C2 18.3229 3.43377 15.9561 5.62845 14.5233C5.16946 12.0717 5.96129 9.45821 8.00392 7.56503C10.0466 5.67183 12.8664 4.93795 15.5116 5.36339C17.0575 3.32905 19.6113 2 22.5 2C25.3886 2 27.9423 3.32894 29.4882 5.36314C32.1335 4.9375 34.9536 5.67134 36.9965 7.56469C39.0392 9.458 39.831 12.0717 39.3718 14.5235C41.5664 15.9563 43 18.323 43 21Z"
+                                stroke="#00DC82"
+                                stroke-width="3.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </div>
+                </UCard>
+                <UCard>
+                    <div
+                        class="flex items-center justify-center gap-4 flex-col"
+                    >
+                        <h2 class="font-medium">SỐ CÂU TRẢ LỜI SAI</h2>
+                        <svg
+                            width="45"
+                            height="45"
+                            viewBox="0 0 45 45"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M26.6633 17.2516L17.8069 27.2187M27.2186 26.6634L17.2516 17.807M37.1857 35.5197C29.8488 43.7767 17.2075 44.5226 8.95054 37.1858C0.693559 29.8489 -0.0523438 17.2076 7.28452 8.95059C14.6214 0.693608 27.2627 -0.0522956 35.5197 7.28457C43.7767 14.6214 44.5226 27.2627 37.1857 35.5197Z"
+                                stroke="#FF1E1E"
+                                stroke-width="4"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </div>
+                </UCard>
+            </div>
+        </div>
+
+        <h1 class="font-medium">Hoặc</h1> -->
+        <div>
+            <USlideover v-model="isOpen">
+                <UCard
+                    class="flex flex-col flex-1 h-full"
+                    :ui="{
+                        body: { base: 'flex-1' },
+                        ring: '',
+                        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+                    }"
+                >
+                    <template #header>
+                        <div class="flex items-center justify-between">
+                            <h3
+                                class="text-base font-semibold leading-6 text-gray-900 dark:text-white uppercase"
+                            >
+                                Kiểm tra và chấm chữa
+                            </h3>
+                            <UButton
+                                color="gray"
+                                variant="ghost"
+                                icon="i-heroicons-x-mark-20-solid"
+                                class="-my-1"
+                                @click="isOpen = false"
+                            />
+                        </div>
+                    </template>
+                    <div class="p-4 h-fit">
+                        <UTabs
+                            :items="state.students"
+                            @change="onMarkStudent"
+                            orientation="horizontal"
+                            :ui="{
+                                container: 'relative w-full',
+                                wrapper: 'flex items-center gap-4 ',
+                                list: {
+                                    width: 'w-full',
+                                    tab: { height: 'h-8' },
+                                },
+                            }"
+                        />
+                    </div>
+
+                    <div
+                        class="flex flex-col gap-2 overflow-hidden h-[70%] p-1"
+                    >
+                        <div class="flex justify-end">
+                            <UButton class="w-fit" @click="generateHTMLToPDF"
+                                >Gửi đến học sinh</UButton
+                            >
+                        </div>
+                        <div
+                            class="shadow-[0_0_1px_#7a7a7a] rounded-sm p-4 flex-1 overflow-y-scroll"
+                        >
+                            <h2
+                                class="font-semibold text-[#3973ca] text-4xl text-center"
+                            >
+                                PHIẾU DẶN DÒ YÊU THƯƠNG
+                            </h2>
+                            <div
+                                class="grid grid-cols-3 px-2 gap-3 mt-3 font-semibold text-[#3973ca]"
+                            >
+                                <p>
+                                    Họ và tên:
+                                    <span
+                                        v-if="state.studentActive['HO VA TEN']"
+                                        >{{
+                                            state.studentActive['HO VA TEN']
+                                        }}</span
+                                    >
+                                </p>
+                                <p>
+                                    Số báo danh:
+                                    <span
+                                        v-if="
+                                            state.studentActive['SO BAO DANH']
+                                        "
+                                        >{{
+                                            state.studentActive['SO BAO DANH']
+                                        }}</span
+                                    >
+                                </p>
+                                <p>Cơ sở: NQH Q10</p>
+                                <p>
+                                    Điểm bài thi:
+                                    <span v-if="state.studentActive['DIEM']">{{
+                                        state.studentActive['DIEM']
+                                    }}</span>
+                                </p>
+                                <p>Học sinh đang học tại NQH: Có</p>
+                                <p>
+                                    Mã đề:
+                                    <span v-if="state.studentActive['MA DE']">{{
+                                        state.studentActive['MA DE']
+                                    }}</span>
+                                </p>
+                            </div>
+                            <p
+                                class="font-semibold text-[#313131] text-2xl text-center mt-3"
+                            >
+                                Những nội dung con cần ôn tập thêm - Đề số: 2
+                            </p>
+                            <ol class="list-decimal p-5">
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href="/google"
+                                        class="underline text-[#3973ca]"
+                                    >
+                                        Câu 2: Với câu này thì sẽ là đáp án như
+                                        sau (Bấm để xem đáp án)
+                                    </a>
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </UCard>
+            </USlideover>
+        </div>
+
+        <div class="flex justify-between items-end">
+            <UFormGroup
+                label="Tải lên file csv"
+                name="file"
+                class="w-fit"
+                eager-validation
+            >
+                <UInput
+                    @change="handleChangeFile"
+                    type="file"
+                    accept="*"
+                    size="sm"
+                />
+            </UFormGroup>
+            <UButton @click="isOpen = true" class="h-fit"
+                >Kiểm tra và sửa bài</UButton
+            >
+        </div>
+        <div
+            class="w-full flex flex-col h-full bg-white rounded-md shadow-sm border overflow-hidden"
+        >
+            <UTable
+                sort-asc-icon="i-heroicons-arrow-up-20-solid"
+                sort-desc-icon="i-heroicons-arrow-down-20-solid"
+                class="relative"
+                :sort-button="{
+                    icon: 'i-heroicons-sparkles-20-solid',
+                    color: 'primary',
+                    variant: 'outline',
+                    size: '2xs',
+                    square: false,
+                }"
+                :columns="state.columns"
+                :rows="rows"
+            />
+
+            <div
+                class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
+            >
+                <UPagination
+                    v-model="page"
+                    :page-count="pageCount"
+                    :total="state.excercies?.length"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+
+<style scoped></style>

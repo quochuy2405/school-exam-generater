@@ -1,0 +1,256 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* we will explain what these classes do next! */
+.v-enter-active,
+.v-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+    opacity: 0;
+}
+@layer components {
+    .input-default {
+        @apply w-full rounded-full border border-gray-600 bg-transparent px-3 leading-8 text-black outline-none transition-colors duration-200 ease-in-out placeholder:text-gray-400 placeholder:font-normal text-base font-medium focus:border-green-400 focus:bg-transparent focus:ring-2 focus:ring-transparent flex-1 pr-6 py-1.5;
+    }
+    .heading {
+        @apply text-3xl font-medium text-black;
+    }
+    .button-action {
+        @apply active:scale-75 transition-transform duration-700 ease-linear cursor-pointer;
+    }
+    .button-default {
+        @apply py-3 m-auto rounded-full w-full text-center px-10 text-sm uppercase font-medium text-white focus:outline-none bg-black focus:z-10 focus:ring-2 focus:ring-gray-200 button-action relative overflow-hidden cursor-pointer;
+    }
+    .link {
+        @apply underline font-medium text-base text-black;
+    }
+}
+@layer base {
+    html {
+        font-family: 'Raleway', sans-serif;
+        height: 100vh;
+        overflow: auto;
+    }
+    .font-did {
+        font-family: 'Didact Gothic', sans-serif;
+    }
+    .nuxt-icon--fill,
+    .nuxt-icon--fill * {
+        fill: none !important;
+    }
+    body::-webkit-scrollbar,
+    .hidden-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    body {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+        scroll-behavior: smooth;
+        overflow: scroll;
+        height: 100vh;
+    }
+    .fade-top {
+        animation-name: fade-top;
+        animation-duration: 0.9s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+    .fade-bottom {
+        animation-name: fade-bottom;
+        animation-duration: 0.9s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+    .fade-in {
+        animation-name: fade-in;
+        animation-duration: 1s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+    .fade-out {
+        animation-name: fade-out;
+        animation-duration: 0.6s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+
+    .fade-left {
+        animation-name: fade-left;
+        animation-duration: 1s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+    .fade-right {
+        animation-name: fade-right;
+        animation-duration: 0.6s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+    .zoom-in {
+        animation-name: zoom-in;
+        animation-duration: 0.6s;
+        animation-fill-mode: forwards;
+    }
+
+    .animation-duration-500 {
+        animation-duration: 0.2s !important;
+    }
+    .absolute-center {
+        transform: translate(-50%, -50%);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+    }
+    .absolute-hozi-center {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .absolute-vertical-center {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .button-wait-tap {
+        height: 200%;
+        width: 0px;
+        position: absolute;
+        box-shadow: 0 0 20px 5px #ffffff;
+        background: #ffffff;
+        transform: rotate(20deg);
+        z-index: 20;
+        top: 0;
+        animation-name: to-right;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        opacity: 0;
+    }
+    #hamburger:checked ~ #bar-mobile,
+    #hamburger:checked ~ #bar-overlay {
+        transform: translateX(-100%);
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 0.2s;
+    }
+
+    #hamburger:not(:checked) ~ #bar-mobile,
+    #hamburger:not(:checked) ~ #bar-overlay {
+        transform: translateX(0);
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 0.5s;
+    }
+}
+
+@keyframes fade-top {
+    0% {
+        transform: translateY(15px);
+        opacity: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        opacity: 1;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes fade-bottom {
+    0% {
+        transform: translateY(-15px);
+        opacity: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes fade-left {
+    0% {
+        transform: translateX(-15px);
+        opacity: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes fade-right {
+    0% {
+        transform: translateX(15px);
+        opacity: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        opacity: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes zoom-in {
+    0% {
+        transform: scale(0);
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        transform: scale(1);
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}
+
+@keyframes to-right {
+    0% {
+        opacity: 0;
+        left: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    10% {
+        left: 5%;
+        opacity: 0.4;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    95% {
+        left: 95%;
+        opacity: 0.6;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+        transition: all cubic-bezier(0.165, 0.84, 0.44, 1) 1s;
+    }
+}

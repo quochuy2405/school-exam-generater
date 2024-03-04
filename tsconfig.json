@@ -1,0 +1,26 @@
+{
+    // https://nuxt.com/docs/guide/concepts/typescript
+    "extends": "./.nuxt/tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@/components/*": ["components/*"],
+            "@/hooks/*": ["hooks/*"],
+            "@/mocks/*": ["mocks/*"],
+            "@/pages/*": ["pages/*"],
+            "@/metadata/*": ["metadata/*"],
+            "@/styles/*": ["styles/*"],
+            "@/types/*": ["types/*"],
+            "@/assets/*": ["assets/*"],
+            "@/contexts/*": ["contexts/*"],
+            "@/utils/*": ["utils/*"],
+            "@/constants/*": ["constants/*"],
+            "@/providers/*": ["providers/*"],
+            "@/layouts/*": ["layouts/*"],
+            "@/stores/*": ["stores/*"],
+            "@/resolvers/*": ["resolvers/*"],
+            "@/composables/*": ["composables/*"]
+        },
+        "incremental": true
+    }
+}
