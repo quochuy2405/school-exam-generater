@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { readLinesFromCSV, generateContent } from '@/utils/csvToJson'
+import { findAll } from '@/composables/firebase/base'
+import { db } from '@/composables/firebase/config'
+import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
+import { collection } from 'firebase/firestore'
+import { z } from 'zod'
 
 definePageMeta({
     layout: 'slot',
@@ -31,7 +35,7 @@ const columns = [
     },
 ]
 const { $pdfMake } = useNuxtApp()
-
+const toast = useToast()
 const isOpen = ref(false)
 const state = reactive({
     code: undefined,
@@ -42,6 +46,7 @@ const state = reactive({
     excercies: [] as any,
     students: [] as any,
     studentActive: undefined as any,
+    answer: [] as any,
 })
 const page = ref(1)
 const pageCount = 10
@@ -64,10 +69,11 @@ const handleChangeFile = (event: any) => {
         state.columns = [...columns, ...colsAdding]
         state.excercies = [...jsonData]
         state.studentActive = state.excercies[0]
+
         state.students = state.excercies.map((item: any) => {
             return {
-                label: `${item['HO VA TEN']}(${item['SO BAO DANH']}) - ${item['MA DE']}`,
-                content: `${item['HO VA TEN']}(${item['SO BAO DANH']}) - ${item['MA DE']}`,
+                label: `${item['HO VA TEN']} (${item['SO BAO DANH']}) - ${item['MA DE']}`,
+                content: `${item['HO VA TEN']} (${item['SO BAO DANH']}) - ${item['MA DE']}`,
                 value: item,
             }
         })
@@ -102,7 +108,10 @@ const loadPdf = () => {
         },
     }
     // playground requires you to assign document definition to a variable called dd
-    const answer = [{ question: 'Cau 2 la gi', link: 'http://localhost:3000/' }]
+    const answer = state.studentActive.incorrerAnswer.map((item: any) => ({
+        question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
+        link: 'https://www.google.co.uk/',
+    }))
     const content = generateContent(state.studentActive, answer)
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         base64ToPDF(
@@ -135,61 +144,45 @@ const generateHTMLToPDF = async () => {
 }
 const onMarkStudent = (index: number) => {
     const student = state.students[index].value
-    state.studentActive = student
+    const incorrerAnswer = checkAndGenerateAnswer(student, state.answer)
+    console.log('incorrerAnswer', incorrerAnswer)
+    state.studentActive = { ...student, incorrerAnswer }
+}
+const onLoadAnswer = () => {
+    isOpen.value = false
+}
+const schema = z.object({
+    code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
+})
+const validate = (state: any): any[] => {
+    const errors = []
+    if (!state.code) {
+        errors.push({ path: 'code', message: 'Vui lòng nhập mã đề' })
+    }
+
+    return errors
+}
+
+async function onSubmit(event: any) {
+    if (!state.file) {
+        toast.add({ title: 'Bạn chưa tải file csv', timeout: 3000 })
+
+        return
+    }
+    // Do something with data
+    const topicsRef = collection(db, 'topics')
+    findAll(topicsRef, [['code', event.data.code]]).then((data: any) => {
+        if (data.length) state.answer = Object.values(data[0].excercies)
+        onMarkStudent(0)
+        isOpen.value = true
+    })
 }
 </script>
 
 <template>
     <div class="flex h-full flex-col gap-3 w-full overflow-y-hidden px-2 py-1">
-        <!-- <div class="w-full bg-white rounded-md flex gap-2">
-            <div class="flex gap-3 flex-1">
-                <UForm
-                    :schema="schema"
-                    :state="state"
-                    class="flex flex-col w-full gap-3"
-                >
-                    <UFormGroup
-                        label="Mã học sinh"
-                        name="class"
-                        eager-validation
-                    >
-                        <UInput
-                            v-model="state.code"
-                            placeholder="Nhập mã học sinh"
-                        />
-                    </UFormGroup>
-                    <UFormGroup
-                        label="Tên học sinh"
-                        name="code"
-                        eager-validation
-                    >
-                        <UInput
-                            v-model="state.code"
-                            placeholder="Nhập tên học sinh"
-                        />
-                    </UFormGroup>
-
-                    <UFormGroup
-                        label="Email học sinh"
-                        name="file"
-                        eager-validation
-                    >
-                        <UInput
-                            v-model="state.code"
-                            placeholder="Nhập email học sinh"
-                        />
-                    </UFormGroup>
-                    <UFormGroup label="Lớp" name="class" eager-validation>
-                        <USelect
-                            v-model="state.class"
-                            placeholder="Lựa chọn lớp"
-                            :options="classes"
-                        />
-                    </UFormGroup>
-                </UForm>
-                <UButton class="h-fit mt-6">Tự động điền</UButton>
-            </div>
-            <div class="flex-1 grid grid-cols-2 gap-4 mt-6">
+        <div class="w-full bg-white rounded-md flex gap-2">
+            <!-- <div class="flex-1 grid grid-cols-2 gap-4 mt-6">
                 <UCard>
                     <div
                         class="flex items-center justify-center gap-4 flex-col"
@@ -234,10 +227,10 @@ const onMarkStudent = (index: number) => {
                         </svg>
                     </div>
                 </UCard>
-            </div>
+            </div> -->
         </div>
 
-        <h1 class="font-medium">Hoặc</h1> -->
+        <!-- <h1 class="font-medium">Hoặc</h1> -->
         <div>
             <USlideover v-model="isOpen">
                 <UCard
@@ -260,7 +253,7 @@ const onMarkStudent = (index: number) => {
                                 variant="ghost"
                                 icon="i-heroicons-x-mark-20-solid"
                                 class="-my-1"
-                                @click="isOpen = false"
+                                @click="onLoadAnswer"
                             />
                         </div>
                     </template>
@@ -281,7 +274,7 @@ const onMarkStudent = (index: number) => {
                     </div>
 
                     <div
-                        class="flex flex-col gap-2 overflow-hidden h-[70%] p-1"
+                        class="flex flex-col gap-2 overflow-hidden h-[600px] p-1"
                     >
                         <div class="flex justify-end">
                             <UButton class="w-fit" @click="generateHTMLToPDF"
@@ -340,112 +333,16 @@ const onMarkStudent = (index: number) => {
                                 Những nội dung con cần ôn tập thêm - Đề số: 2
                             </p>
                             <ol class="list-decimal p-5">
-                                <li>
+                                <li
+                                    v-for="item in state.studentActive
+                                        .incorrerAnswer"
+                                >
                                     <a
-                                        href="/google"
+                                        href="https://www.google.co.uk/"
                                         class="underline text-[#3973ca]"
                                     >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="/google"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        Câu 2: Với câu này thì sẽ là đáp án như
-                                        sau (Bấm để xem đáp án)
+                                        {{ item['Câu Hỏi'] }} -
+                                        {{ item['Giải pháp'] }}
                                     </a>
                                 </li>
                             </ol>
@@ -456,22 +353,35 @@ const onMarkStudent = (index: number) => {
         </div>
 
         <div class="flex justify-between items-end">
-            <UFormGroup
-                label="Tải lên file csv"
-                name="file"
-                class="w-fit"
-                eager-validation
+            <UForm
+                :schema="schema"
+                :state="state"
+                :validate="validate"
+                @submit="onSubmit"
+                class="flex gap-3"
             >
-                <UInput
-                    @change="handleChangeFile"
-                    type="file"
-                    accept="*"
-                    size="sm"
-                />
-            </UFormGroup>
-            <UButton @click="isOpen = true" class="h-fit"
-                >Kiểm tra và sửa bài</UButton
-            >
+                <UFormGroup
+                    label="Tải lên file csv"
+                    name="file"
+                    class="w-fit flex flex-col"
+                    eager-validation
+                >
+                    <UInput
+                        @change="handleChangeFile"
+                        type="file"
+                        accept="*"
+                        size="sm"
+                    />
+                </UFormGroup>
+                <UFormGroup label="Mã đề" name="code" eager-validation required>
+                    <UInput v-model="state.code" placeholder="Nhập mã đề" />
+                </UFormGroup>
+                <div class="flex flex-1 items-end justify-end">
+                    <UButton type="submit" class="h-fit"
+                        >Kiểm tra và sửa bài</UButton
+                    >
+                </div>
+            </UForm>
         </div>
         <div
             class="w-full flex flex-col h-full bg-white rounded-md shadow-sm border overflow-hidden"

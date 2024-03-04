@@ -3,13 +3,13 @@ import { getFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { getStorage } from 'firebase/storage'
 const firebaseConfig = {
-    apiKey: 'AIzaSyCrVC4qMogDlwnYlRWL2Ajzxg0AmuY9FNg',
-    authDomain: 'beliystoreadmin.firebaseapp.com',
-    projectId: 'beliystoreadmin',
-    storageBucket: 'beliystoreadmin.appspot.com',
-    messagingSenderId: '688011164935',
-    appId: '1:688011164935:web:6d6a59eba7b6781e5059a2',
-    measurementId: 'G-H4ML234RQD',
+    apiKey: 'AIzaSyDWodgWq2bRpccNHiCCtB8gbkOYsEIAO9w',
+    authDomain: 'school-exam-generate.firebaseapp.com',
+    projectId: 'school-exam-generate',
+    storageBucket: 'school-exam-generate.appspot.com',
+    messagingSenderId: '712719913047',
+    appId: '1:712719913047:web:1cad9385e5e9e631141312',
+    measurementId: 'G-QW4NTSPLM3',
 }
 
 // Use these for db & auth

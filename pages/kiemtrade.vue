@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { create } from '@/composables/firebase/base'
+import { create, findAll } from '@/composables/firebase/base'
 import { db } from '@/composables/firebase/config'
 import { collection } from 'firebase/firestore'
 import { z } from 'zod'
@@ -11,8 +11,6 @@ definePageMeta({
     },
 })
 
-const classes = ['Lớp 1', 'Lớp 2', 'Lớp 3']
-const types = ['Loại 1', 'Loại 2', 'Loại 3']
 const columns = [
     {
         key: 'STT',
@@ -50,25 +48,11 @@ const columns = [
 const toast = useToast()
 const state = reactive({
     code: undefined,
-    class: undefined,
-    types: undefined,
-    file: undefined,
+
     excercies: [] as any,
 })
 const page = ref(1)
 const pageCount = 20
-
-const handleChangeFile = (event: any) => {
-    const reader = new FileReader()
-    const file = event.target.files[0]
-    reader.onload = (e: any) => {
-        const csvText = e.target.result
-        const json = csvToJson(csvText) as any
-        state.excercies = [...json]
-    }
-    reader.readAsText(file)
-    state.file = file
-}
 
 const rows = computed(() => {
     const data = state.excercies?.slice(
@@ -91,25 +75,10 @@ const validate = (state: any): any[] => {
 
 async function onSubmit(event: any) {
     // Do something with data
-    if (!state.file) {
-        toast.add({ title: 'Bạn chưa tải file csv', timeout: 3000 })
-
-        return
-    }
-
     const topicsRef = collection(db, 'topics')
-    const dataCreate = {
-        code: event.data.code,
-        excercies: { ...event.data.excercies },
-    }
-    create(topicsRef, { ...dataCreate })
-        .then(() => {
-            toast.add({ title: 'Đã tạo dữ liệu thành công', timeout: 3000 })
-        })
-        .catch((e) => {
-            console.log('e', e)
-            toast.add({ title: 'Lỗi', timeout: 3000 })
-        })
+    findAll(topicsRef, [['code', event.data.code]]).then((data: any) => {
+        if (data.length) state.excercies = Object.values(data[0].excercies)
+    })
 }
 </script>
 
@@ -123,13 +92,6 @@ async function onSubmit(event: any) {
                 @submit="onSubmit"
                 ><div class="grid grid-cols-2 lg:w-3/5 gap-3">
                     <div class="flex flex-col gap-2">
-                        <UFormGroup label="Lớp" name="class" eager-validation>
-                            <USelect
-                                v-model="state.class"
-                                placeholder="Lựa chọn lớp"
-                                :options="classes"
-                            />
-                        </UFormGroup>
                         <UFormGroup
                             label="Mã đề"
                             name="code"
@@ -142,36 +104,11 @@ async function onSubmit(event: any) {
                             />
                         </UFormGroup>
                     </div>
-                    <div class="flex flex-col gap-2">
-                        <UFormGroup
-                            label="Loại đề"
-                            name="class"
-                            eager-validation
-                        >
-                            <USelect
-                                v-model="state.types"
-                                placeholder="Lựa chọn loại đề"
-                                :options="types"
-                            />
-                        </UFormGroup>
-                        <UFormGroup
-                            label="Tải lên file csv"
-                            name="file"
-                            eager-validation
-                        >
-                            <UInput
-                                :model-value="state.file"
-                                @change="handleChangeFile"
-                                type="file"
-                                size="sm"
-                            />
-                        </UFormGroup>
-                    </div>
                 </div>
 
                 <div class="flex justify-end">
                     <UButton type="submit" class="h-fit w-fit px-2"
-                        >Thêm bộ câu hỏi</UButton
+                        >Tìm kiếm bộ câu hỏi</UButton
                     >
                 </div>
             </UForm>

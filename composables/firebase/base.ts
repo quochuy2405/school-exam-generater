@@ -1,4 +1,3 @@
-import { ProductType } from '@/types/product'
 import {
     QueryDocumentSnapshot,
     QuerySnapshot,
@@ -9,14 +8,14 @@ import {
     getDocs,
     updateDoc,
 } from 'firebase/firestore'
-import { ref, uploadBytes } from 'firebase/storage'
-import { db, storage } from './config'
+import { db } from './config'
 
 // Create a new document
 const create = async (collectionRef: any, data: object) => {
     const createdAt = new Date().getTime()
 
     const newData = { ...data, createdAt }
+    console.log('newData', newData)
     const docRef = await addDoc(collectionRef, newData)
     return docRef.id
 }
@@ -34,11 +33,10 @@ const read = async (collectionName: string, id: string) => {
 // Read all documents in a collection
 const readAll = async (collectionRef: any) => {
     const querySnapshot = await getDocs(collectionRef)
-    const documents = []
+    const documents: any = []
     querySnapshot.docs.forEach((doc: any) => {
         documents.push({ id: doc.id, ...doc.data() })
     })
-    console.log('documents', documents)
     return documents
 }
 export type Condition<T> = [string, T[keyof T] | T[keyof T][]]
@@ -53,13 +51,14 @@ const findAll = async <T>(
         const docData = doc.data()
         if (doc.exists() && docData) {
             // Check if snapshot exists and contains data
-            const item: T = { ...docData, id: doc.id } // Include document ID as 'id' property in returned data
+            const item: any = { ...docData, id: doc.id } // Include document ID as 'id' property in returned data
+
             if (
                 conditions.every((condition) => {
                     const [key, value] = condition
                     return Array.isArray(value)
                         ? value.includes(item[key])
-                        : item[key] === value
+                        : `${item[key]}` === `${value}`
                 })
             ) {
                 data.push(item)
@@ -79,37 +78,4 @@ const deleteItem = async (collectionRef: any, id: string) => {
     await deleteDoc(doc(db, collectionRef, id))
 }
 
-const addImage = async (file: File, path: string): Promise<string> => {
-    const storageRef = ref(storage, path)
-    const snapshot = await uploadBytes(storageRef, file)
-    return snapshot.metadata.fullPath
-}
-
-// Check quantity of items before adding an order
-const checkQuantityBeforeAddOrder = async (items: Array<ProductType>) => {
-    for (const item of items) {
-        // Retrieve the item document from the 'items' collection
-        const itemDoc = await read('products', item.id)
-
-        if (itemDoc) {
-            const itemQuantity = itemDoc.quantity
-
-            // Check if the item's quantity is sufficient for the order
-            if (itemQuantity < item.quantityOrder) {
-                return `Bạn ơi! Sản phẩm ${item.name} Kho hiện tại chỉ còn ${itemQuantity} thôi ạ.`
-            }
-        }
-    }
-    return 'pass'
-}
-
-export {
-    addImage,
-    checkQuantityBeforeAddOrder,
-    create,
-    deleteItem,
-    findAll,
-    read,
-    readAll,
-    update,
-}
+export { create, deleteItem, findAll, read, readAll, update }

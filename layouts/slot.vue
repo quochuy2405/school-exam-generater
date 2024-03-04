@@ -8,4 +8,5 @@ import { NavBar } from '@/components/organisms'
             <slot></slot>
         </div>
     </div>
+    
 </template>

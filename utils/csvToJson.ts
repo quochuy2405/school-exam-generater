@@ -1,14 +1,19 @@
 export const csvToJson = (csv: string) => {
     const lines = csv.split('\r\n')
     const result = []
-    const headers = lines[0].split(',')
+    const headers = lines[0]
+        .split(',')
+        .filter((header) => !!header?.trim())
+        .map((item) => item?.trim())
 
     for (let i = 1; i < lines.length; i++) {
         const obj: any = {}
         const currentLine = lines[i].split(',')
 
         for (let j = 0; j < headers.length; j++) {
-            obj[headers[j]] = currentLine[j]
+            if (currentLine[j]) {
+                obj[headers[j]] = currentLine[j]
+            }
         }
 
         result.push(obj)
@@ -23,7 +28,7 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
     const jsonData: any[] = []
     const header = lines[0]
         .split(',')
-        .filter((header) => !!header)
+        .filter((header) => !!header?.trim())
         .map((item) => item?.trim())
     // Bắt đầu từ dòng startLineIndex, lặp qua số lượng linesToRead dòng và bỏ qua 3 dòng tiếp theo
     for (let i = startLineIndex + 1; i < lines.length; i += 3) {

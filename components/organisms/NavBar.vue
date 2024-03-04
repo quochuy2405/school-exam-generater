@@ -10,6 +10,7 @@ import { ItemNav } from '../atoms'
             <div class="flex flex-col gap-2">
                 <ItemNav href="/" name="Chấm chữa bài" />
                 <ItemNav href="/nhaplieu" name="Nhập liệu" />
+                <ItemNav href="/kiemtrade" name="Kiểm tra đề" />
                 <ItemNav href="/hocvien" name="Danh sách học viên" />
             </div>
         </div>
