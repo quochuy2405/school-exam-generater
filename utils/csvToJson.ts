@@ -162,8 +162,8 @@ export const generateContent = (student: any, anwers: Array<any>) => {
 
                 bold: true,
                 alignment: 'center',
-                fontSize: 22,
-                color: '#3973ca',
+                fontSize: 16,
+                color: 'black',
                 margin: [0, 10],
             },
 

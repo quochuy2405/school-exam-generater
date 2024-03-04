@@ -112,11 +112,12 @@ const loadPdf = () => {
         question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
         link: 'https://www.google.co.uk/',
     }))
+    const filename = `${state.studentActive['HO VA TEN']}(${state.studentActive['SO BAO DANH']})-${state.studentActive['MA DE']}.pdf`
     const content = generateContent(state.studentActive, answer)
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         base64ToPDF(
             base64Data.replace('data:application/pdf;base64,', ''),
-            'test.pdf',
+            filename,
         )
     })
 }
@@ -133,7 +134,7 @@ const base64ToPDF = (base64Data: any, fileName: string) => {
     // Tạo một đường link để tải tệp PDF
     const link = document.createElement('a')
     link.href = url
-    link.download = fileName || 'document.pdf'
+    link.download = fileName || 'loigiai.pdf'
     link.click()
 
     // Giải phóng URL đối tượng khi đã sử dụng xong
@@ -145,7 +146,6 @@ const generateHTMLToPDF = async () => {
 const onMarkStudent = (index: number) => {
     const student = state.students[index].value
     const incorrerAnswer = checkAndGenerateAnswer(student, state.answer)
-    console.log('incorrerAnswer', incorrerAnswer)
     state.studentActive = { ...student, incorrerAnswer }
 }
 const onLoadAnswer = () => {
@@ -278,7 +278,7 @@ async function onSubmit(event: any) {
                     >
                         <div class="flex justify-end">
                             <UButton class="w-fit" @click="generateHTMLToPDF"
-                                >Gửi đến học sinh</UButton
+                                >Tải bản PDF lời giải</UButton
                             >
                         </div>
                         <div

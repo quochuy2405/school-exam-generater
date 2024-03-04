@@ -1,7 +1,16 @@
 export default defineAppConfig({
     ui: {
         slideover: {
-            width: 'w-screen lg:max-w-[80%]',
+            width: 'w-screen max-w-[80%]',
+            translate: {
+                base: 'translate-x-0',
+                left: '-translate-x-full rtl:translate-x-full',
+                right: 'translate-x-full rtl:-translate-x-full',
+            },
+            transition: {
+                enter: 'transform transition ease-in-out duration-300',
+                leave: 'transform transition ease-in-out duration-200',
+            },
         },
         table: {
             wrapper: 'relative overflow-x-auto flex-1 overflow-auto',

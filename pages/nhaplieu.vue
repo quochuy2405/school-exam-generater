@@ -123,13 +123,13 @@ async function onSubmit(event: any) {
                 @submit="onSubmit"
                 ><div class="grid grid-cols-2 lg:w-3/5 gap-3">
                     <div class="flex flex-col gap-2">
-                        <UFormGroup label="Lớp" name="class" eager-validation>
+                        <!-- <UFormGroup label="Lớp" name="class" eager-validation>
                             <USelect
                                 v-model="state.class"
                                 placeholder="Lựa chọn lớp"
                                 :options="classes"
                             />
-                        </UFormGroup>
+                        </UFormGroup> -->
                         <UFormGroup
                             label="Mã đề"
                             name="code"
@@ -143,7 +143,7 @@ async function onSubmit(event: any) {
                         </UFormGroup>
                     </div>
                     <div class="flex flex-col gap-2">
-                        <UFormGroup
+                        <!-- <UFormGroup
                             label="Loại đề"
                             name="class"
                             eager-validation
@@ -153,7 +153,7 @@ async function onSubmit(event: any) {
                                 placeholder="Lựa chọn loại đề"
                                 :options="types"
                             />
-                        </UFormGroup>
+                        </UFormGroup> -->
                         <UFormGroup
                             label="Tải lên file csv"
                             name="file"
