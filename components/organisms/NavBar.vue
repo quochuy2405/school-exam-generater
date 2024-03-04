@@ -3,8 +3,7 @@ import { ItemNav } from '../atoms'
 </script>
 
 <template>
-    <UCard class="h-full !max-h-[100dvh] w-64" padding="0">
-        <div></div>
+    <UCard class="h-full !max-h-[100dvh] max-w-[30%] w-64" padding="0">
         <div class="mt-5 flex flex-col gap-3">
             <h3 class="font-normal text-gray-600 text-xs">MAIN MENU</h3>
             <div class="flex flex-col gap-2">

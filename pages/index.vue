@@ -358,7 +358,7 @@ async function onSubmit(event: any) {
                 :state="state"
                 :validate="validate"
                 @submit="onSubmit"
-                class="flex gap-3"
+                class="flex gap-3 flex-wrap"
             >
                 <UFormGroup
                     label="Tải lên file csv"

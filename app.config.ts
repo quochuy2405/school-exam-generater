@@ -14,7 +14,7 @@ export default defineAppConfig({
         },
         table: {
             wrapper: 'relative overflow-x-auto flex-1 overflow-auto',
-            base: 'w-full relative flex-1 h-full',
+            base: 'relative flex-1 h-full',
             thead: 'sticky top-0 shadow bg-white',
             td: {
                 base: 'whitespace-normal break-words',

@@ -23,24 +23,24 @@ const columns = [
         key: 'Câu Hỏi',
         label: 'Câu Hỏi',
         sortable: true,
-        class: 'min-w-[100px]',
+        class: 'w-[200px]',
     },
     {
         key: 'Dạng',
         label: 'Dạng',
         sortable: true,
-        class: 'min-w-[60px]',
+        class: 'w-[150px]',
     },
     {
         key: 'Đáp Án',
         label: 'Đáp Án',
         sortable: true,
-        class: 'w-[100px]',
+        class: 'w-[200px]',
     },
     {
         key: 'Giải pháp',
         label: 'Giải pháp',
-        class: 'w-[200px]',
+        class: 'w-[300px]',
     },
     {
         key: 'Đường dẫn',
@@ -114,13 +114,14 @@ async function onSubmit(event: any) {
 </script>
 
 <template>
-    <div class="flex h-full flex-col gap-3 w-full overflow-auto px-2 py-1">
+    <div class="flex h-full flex-col gap-3 w-full overflow-auto px-2 py-1 overflow-hidden">
         <UCard>
             <UForm
                 :schema="schema"
                 :state="state"
                 :validate="validate"
                 @submit="onSubmit"
+                class="flex flex-col gap-2"
                 ><div class="grid grid-cols-2 lg:w-3/5 gap-3">
                     <div class="flex flex-col gap-2">
                         <!-- <UFormGroup label="Lớp" name="class" eager-validation>
