@@ -366,11 +366,12 @@ async function onSubmit(event: any) {
                     class="w-fit flex flex-col"
                     eager-validation
                 >
-                    <UInput
+                    <input
                         @change="handleChangeFile"
                         type="file"
                         accept="*"
                         size="sm"
+                        class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
                     />
                 </UFormGroup>
                 <UFormGroup label="Mã đề" name="code" eager-validation required>

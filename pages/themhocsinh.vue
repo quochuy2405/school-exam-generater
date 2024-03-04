@@ -129,11 +129,13 @@ const rows = computed(() => {
                 class="w-fit"
                 eager-validation
             >
-                <UInput
+                <input
                     :model-value="state.file"
                     @change="handleChangeFile"
                     type="file"
+                    accept="*"
                     size="sm"
+                    class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
                 />
             </UFormGroup>
             <UButton class="h-fit">Thêm tất cả học sinh</UButton>
