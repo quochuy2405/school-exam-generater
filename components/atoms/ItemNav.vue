@@ -5,7 +5,6 @@ type Props = {
 }
 const { href, name } = withDefaults(defineProps<Props>(), {})
 const route = useRoute()
-console.log('route.matched.path', route.matched[0]['path'])
 </script>
 
 <template>
