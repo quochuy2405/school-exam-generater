@@ -180,13 +180,14 @@ async function onSubmit(event: any) {
     findAll(topicsRef, [['code', event.data.code]]).then((data: any) => {
         if (data.length) state.answer = Object.values(data[0].excercies)
         onMarkStudent(0)
+        loadPdf()
         isOpen.value = true
     })
 }
 
 async function sendEmail(): Promise<void> {
-    state.loading = true
     await loadPdf()
+    state.loading = true
     const data: IFormData = {
         name: state.studentActive,
         email: state.emailtest,
