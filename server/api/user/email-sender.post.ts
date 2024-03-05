@@ -25,7 +25,7 @@ const sendMail = async (data: IEmailData): Promise<void> => {
     const getAccessTokenObject = await myOAuth2Client.getAccessToken()
     const accessToken = getAccessTokenObject?.token
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'Gmail',
         host: 'smtp.gmail.com',
         port: 587,
         secure: true,
@@ -41,7 +41,7 @@ const sendMail = async (data: IEmailData): Promise<void> => {
     })
     const compileSource = handlebars.compile(data.source)
     const mailOptions = {
-        from: 'Trung tâm NQH <work@gmail.com>',
+        from: 'Trung tâm NQH <work.huypui@gmail.com>',
         to: data.head.to,
         subject: data.head.subject,
         html: compileSource(data.body),

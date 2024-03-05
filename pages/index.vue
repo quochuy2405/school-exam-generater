@@ -126,6 +126,48 @@ const loadPdf = async () => {
         )
     })
 }
+
+const dowloadPdf = async () => {
+    const pdfMaker = $pdfMake as any
+    pdfMaker.tableLayouts = {
+        custom: {
+            fillColor: function (rowIndex: number) {
+                return rowIndex % 2 !== 0 ? '#00000' : null
+            },
+            hLineColor: '#00000',
+            vLineColor: '#00000',
+            paddingLeft: function () {
+                return 10
+            },
+            paddingRight: function () {
+                return 10
+            },
+        },
+    }
+    // playground requires you to assign document definition to a variable called dd
+    const answer = state.studentActive.incorrerAnswer.map((item: any) => ({
+        question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
+        link: 'https://www.google.co.uk/',
+    }))
+    const filename = `${state.studentActive['HO VA TEN']}(${state.studentActive['SO BAO DANH']})-${state.studentActive['MA DE']}.pdf`
+    const content = generateContent(state.studentActive, answer)
+    pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
+        const blob = base64ToPDF(
+            base64Data.replace('data:application/pdf;base64,', ''),
+            filename,
+        )
+        const url = URL.createObjectURL(blob)
+
+        // Tạo một đường link để tải tệp PDF
+        const link = document.createElement('a')
+        link.href = url
+        link.download = filename || 'loigiai.pdf'
+        link.click()
+
+        // Giải phóng URL đối tượng khi đã sử dụng xong
+        URL.revokeObjectURL(url)
+    })
+}
 const base64ToPDF = (base64Data: any, fileName: string) => {
     const byteCharacters = atob(base64Data)
     const byteNumbers = new Array(byteCharacters.length)
@@ -135,19 +177,10 @@ const base64ToPDF = (base64Data: any, fileName: string) => {
     const byteArray = new Uint8Array(byteNumbers)
     const blob = new Blob([byteArray], { type: 'application/pdf' })
     state.pdf = blob
-    // const url = URL.createObjectURL(blob)
-
-    // // Tạo một đường link để tải tệp PDF
-    // const link = document.createElement('a')
-    // link.href = url
-    // link.download = fileName || 'loigiai.pdf'
-    // link.click()
-
-    // // Giải phóng URL đối tượng khi đã sử dụng xong
-    // URL.revokeObjectURL(url)
+    return blob
 }
 const generateHTMLToPDF = async () => {
-    loadPdf()
+    dowloadPdf()
 }
 const onMarkStudent = (index: number) => {
     const student = state.students[index].value
