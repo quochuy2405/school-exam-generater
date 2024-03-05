@@ -107,7 +107,7 @@ async function onSubmit(event: any) {
             toast.add({ title: 'Đã tạo dữ liệu thành công', timeout: 3000 })
         })
         .catch((e) => {
-            console.log('e', e)
+    
             toast.add({ title: 'Lỗi', timeout: 3000 })
         })
 }

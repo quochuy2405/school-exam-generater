@@ -19,7 +19,8 @@
         "csv-parse": "^5.5.5",
         "firebase": "9.22.0",
         "html-to-pdfmake": "^2.5.2",
-        "nodemailer": "^6.9.11",
+        "nodemailer": "^6.9.1",
+        "nodemailer-smtp-transport": "^2.7.4",
         "nuxt": "^3.10.3",
         "nuxt-mail": "^4.0.3",
         "pinia": "^2.1.4",
@@ -29,6 +30,10 @@
         "zod": "^3.22.4"
     },
     "devDependencies": {
+        "@types/node": "^18",
+        "@types/nodemailer": "^6.4.7",
+        "google-auth-library": "^9.6.3",
+        "handlebars": "^4.7.7",
         "nuxt-pdfmake": "^0.0.16",
         "prettier-plugin-tailwindcss": "^0.5.11",
         "sass": "^1.71.1"

@@ -4,6 +4,7 @@ import { db } from '@/composables/firebase/config'
 import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
 import { collection } from 'firebase/firestore'
 import { z } from 'zod'
+import type { IFormData } from '../types'
 
 definePageMeta({
     layout: 'slot',
@@ -36,17 +37,20 @@ const columns = [
 ]
 const { $pdfMake } = useNuxtApp()
 const toast = useToast()
+const successMessage = ref<string | null>(null)
 const isOpen = ref(false)
 const state = reactive({
     code: undefined,
     class: undefined,
     types: undefined,
     file: undefined,
+    emailtest: '',
     columns: [] as any,
     excercies: [] as any,
     students: [] as any,
     studentActive: undefined as any,
     answer: [] as any,
+    pdf: [] as any,
 })
 const page = ref(1)
 const pageCount = 10
@@ -129,16 +133,17 @@ const base64ToPDF = (base64Data: any, fileName: string) => {
     }
     const byteArray = new Uint8Array(byteNumbers)
     const blob = new Blob([byteArray], { type: 'application/pdf' })
-    const url = URL.createObjectURL(blob)
+    state.pdf = blob
+    // const url = URL.createObjectURL(blob)
 
-    // Tạo một đường link để tải tệp PDF
-    const link = document.createElement('a')
-    link.href = url
-    link.download = fileName || 'loigiai.pdf'
-    link.click()
+    // // Tạo một đường link để tải tệp PDF
+    // const link = document.createElement('a')
+    // link.href = url
+    // link.download = fileName || 'loigiai.pdf'
+    // link.click()
 
-    // Giải phóng URL đối tượng khi đã sử dụng xong
-    URL.revokeObjectURL(url)
+    // // Giải phóng URL đối tượng khi đã sử dụng xong
+    // URL.revokeObjectURL(url)
 }
 const generateHTMLToPDF = async () => {
     loadPdf()
@@ -176,6 +181,52 @@ async function onSubmit(event: any) {
         onMarkStudent(0)
         isOpen.value = true
     })
+}
+
+async function sendEmail(): Promise<void> {
+    loadPdf()
+    const data: IFormData = {
+        name: state.studentActive,
+        email: state.emailtest,
+        subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
+        body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${state.studentActive['DIEM']}`,
+    }
+    successMessage.value = null
+
+    const filename = `${state.studentActive['SO BAO DANH']}-${state.studentActive['MA DE']}.pdf`
+
+    const headers = new Headers({
+        fileName: filename,
+    })
+
+    const form = new FormData()
+    form.append('name', state.studentActive['HO VA TEN'])
+    form.append('email', data.email)
+    form.append('subject', data.subject)
+    form.append('body', data.body)
+    form.append('pdf', state.pdf)
+
+    const requestData: any = {
+        formData: form,
+        fileHeaders: headers,
+    }
+    const requestInit: any = {
+        method: 'POST',
+        body: requestData.formData,
+        headers: requestData.fileHeaders,
+    }
+    try {
+        $fetch('/api/user/email-sender', requestInit)
+            .then((data) => {
+              
+                successMessage.value = 'Email has been sent.'
+            })
+            .catch((error) => {
+                console.log('error', error)
+            })
+    } catch (error) {
+        console.log(error)
+    }
 }
 </script>
 
@@ -276,9 +327,18 @@ async function onSubmit(event: any) {
                     <div
                         class="flex flex-col gap-2 overflow-hidden h-[600px] p-1"
                     >
-                        <div class="flex justify-end">
+                        <div class="flex justify-end gap-4">
                             <UButton class="w-fit" @click="generateHTMLToPDF"
                                 >Tải bản PDF lời giải</UButton
+                            >
+                            <UFormGroup name="code" eager-validation required>
+                                <UInput
+                                    v-model="state.emailtest"
+                                    placeholder="Nhập email đích để test"
+                                />
+                            </UFormGroup>
+                            <UButton class="w-fit" @click="sendEmail"
+                                >Gửi kết lời giải qua Email</UButton
                             >
                         </div>
                         <div

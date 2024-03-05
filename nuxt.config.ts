@@ -6,4 +6,10 @@ export default defineNuxtConfig({
     colorMode: {
         preference: 'light',
     },
+    runtimeConfig: {
+        apiSecret: {
+            EMAIL_USER: process.env.NUXT_MAILER_USER,
+            EMAIL_PASS: process.env.NUXT_MAILER_PASS,
+        },
+    },
 })
