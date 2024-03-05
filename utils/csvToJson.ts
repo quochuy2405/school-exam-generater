@@ -6,7 +6,7 @@ export const csvToJson = (csv: string) => {
         .filter((header) => !!header?.trim())
         .map((item) => item?.trim())
 
-    for (let i = 1; i < lines.length; i++) {
+    for (let i = 2; i < lines.length; i++) {
         const obj: any = {}
         const currentLine = lines[i].split(',')
 
@@ -30,8 +30,9 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
         .split(',')
         .filter((header) => !!header?.trim())
         .map((item) => item?.trim())
+
     // Bắt đầu từ dòng startLineIndex, lặp qua số lượng linesToRead dòng và bỏ qua 3 dòng tiếp theo
-    for (let i = startLineIndex + 1; i < lines.length; i += 3) {
+    for (let i = startLineIndex + 2; i < lines.length; i += 1) {
         if (i >= lines.length) {
             // Kiểm tra nếu đã đọc hết dữ liệu
             break
@@ -39,6 +40,7 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
 
         const lineToRead = lines[i]
         const dataLineSplit = lineToRead.split(',')
+        console.log('dataLineSplit[0]', dataLineSplit[0])
         if (!dataLineSplit[0]) continue
         const jsonDataLine = csvLineToJson(dataLineSplit, header) // Chuyển đổi dòng CSV thành JSON
 
@@ -49,19 +51,27 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
     return { header, jsonData }
 }
 
+const validates = ['TRA LOI']
 // Hàm chuyển đổi dòng CSV thành JSON (đã được đề cập trong câu trả lời trước đó)
 const csvLineToJson = (dataLineSplit: Array<string>, header: any) => {
     const data = dataLineSplit
     const entry: any = {}
-
     for (let j = 0; j < header.length; j++) {
+        if (validates.includes(data[j]?.trim())) {
+            continue
+        }
+
         entry[header[j]] = data[j]?.trim() || 'X' // Gán giá trị vào từng cột
     }
 
     return entry
 }
 
-export const generateContent = (student: any, anwers: Array<any>) => {
+export const generateContent = (
+    student: any,
+    anwers: Array<any>,
+    mark: string,
+) => {
     const ol = anwers.map((item) => ({
         text: `${item.question} (Bấm để xem đáp án)`,
         link: item.link,
@@ -104,7 +114,7 @@ export const generateContent = (student: any, anwers: Array<any>) => {
                 columns: [
                     {
                         width: '*',
-                        text: 'Họ và tên: ' + student['HO VA TEN'],
+                        text: 'Họ và tên: ' + student['Họ và Tên'],
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -112,7 +122,7 @@ export const generateContent = (student: any, anwers: Array<any>) => {
                         margin: [0, 10],
                     },
                     {
-                        text: 'Số báo danh: ' + student['SO BAO DANH'],
+                        text: 'Số báo danh: ' + student['Số Báo Danh'],
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -133,7 +143,7 @@ export const generateContent = (student: any, anwers: Array<any>) => {
                 columns: [
                     {
                         width: '*',
-                        text: 'Điểm bài thi: ' + student['DIEM'],
+                        text: 'Điểm bài thi: ' + mark,
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -147,7 +157,7 @@ export const generateContent = (student: any, anwers: Array<any>) => {
                         color: '#3973ca',
                     },
                     {
-                        text: 'Mã đề: ' + student['MA DE'],
+                        text: 'Mã đề: ' + student['Mã đề'],
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -158,7 +168,7 @@ export const generateContent = (student: any, anwers: Array<any>) => {
             {
                 text:
                     'Những nội dung con cần ôn tập thêm - Đề số: ' +
-                    student['MA DE'],
+                    student['Mã đề'],
 
                 bold: true,
                 alignment: 'center',

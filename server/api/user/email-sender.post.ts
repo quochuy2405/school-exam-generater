@@ -38,7 +38,7 @@ const sendMail = async (data: IEmailData): Promise<void> => {
             accessToken,
             expires: 1484314697598,
         },
-    })
+    } as any)
     const compileSource = handlebars.compile(data.source)
     const mailOptions = {
         from: 'Trung tâm NQH <work.huypui@gmail.com>',

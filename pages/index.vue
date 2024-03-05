@@ -15,22 +15,22 @@ definePageMeta({
 
 const columns = [
     {
-        key: 'HO VA TEN',
-        label: 'Họ và tên',
+        key: 'Họ và Tên',
+        label: 'Họ và Tên',
         class: 'w-[120px]',
     },
     {
-        key: 'SO BAO DANH',
-        label: 'Số báo danh',
+        key: 'Số Báo Danh',
+        label: 'Số Báo Danh',
         class: 'w-[100px]',
     },
     {
-        key: 'MA DE',
+        key: 'Mã đề',
         label: 'Mã đề',
         class: 'w-[60px]',
     },
     {
-        key: 'DIEM',
+        key: 'Điểm',
         label: 'Điểm',
         class: 'w-[120px]',
     },
@@ -77,9 +77,10 @@ const handleChangeFile = (event: any) => {
 
         state.students = state.excercies.map((item: any) => {
             return {
-                label: `${item['HO VA TEN']} (${item['SO BAO DANH']}) - ${item['MA DE']}`,
-                content: `${item['HO VA TEN']} (${item['SO BAO DANH']}) - ${item['MA DE']}`,
+                label: `${item['Họ và Tên']} (${item['Số Báo Danh']}) - ${item['Mã đề']}`,
+                content: `${item['Họ và Tên']} (${item['Số Báo Danh']}) - ${item['Mã đề']}`,
                 value: item,
+                slot: 'pdf',
             }
         })
     }
@@ -117,8 +118,9 @@ const loadPdf = async () => {
         question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
         link: 'https://www.google.co.uk/',
     }))
-    const filename = `${state.studentActive['HO VA TEN']}(${state.studentActive['SO BAO DANH']})-${state.studentActive['MA DE']}.pdf`
-    const content = generateContent(state.studentActive, answer)
+    const filename = `${state.studentActive['Họ và Tên']}(${state.studentActive['Số Báo Danh']})-${state.studentActive['Mã đề']}.pdf`
+    const mark = caculatorMark()
+    const content = generateContent(state.studentActive, answer, mark)
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         base64ToPDF(
             base64Data.replace('data:application/pdf;base64,', ''),
@@ -149,8 +151,9 @@ const dowloadPdf = async () => {
         question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
         link: 'https://www.google.co.uk/',
     }))
-    const filename = `${state.studentActive['HO VA TEN']}(${state.studentActive['SO BAO DANH']})-${state.studentActive['MA DE']}.pdf`
-    const content = generateContent(state.studentActive, answer)
+    const filename = `${state.studentActive['Họ và Tên']}(${state.studentActive['Số Báo Danh']})-${state.studentActive['Mã đề']}.pdf`
+    const mark = caculatorMark()
+    const content = generateContent(state.studentActive, answer, mark)
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         const blob = base64ToPDF(
             base64Data.replace('data:application/pdf;base64,', ''),
@@ -225,18 +228,18 @@ async function sendEmail(): Promise<void> {
         name: state.studentActive,
         email: state.emailtest,
         subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
-        body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${state.studentActive['DIEM']}`,
+        body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${caculatorMark()}`,
     }
     successMessage.value = null
 
-    const filename = `${state.studentActive['SO BAO DANH']}-${state.studentActive['MA DE']}.pdf`
+    const filename = `${state.studentActive['Số Báo Danh']}-${state.studentActive['Mã đề']}.pdf`
 
     const headers = new Headers({
         fileName: filename,
     })
 
     const form = new FormData()
-    form.append('name', state.studentActive['HO VA TEN'])
+    form.append('name', state.studentActive['Họ và Tên'])
     form.append('email', data.email)
     form.append('subject', data.subject)
     form.append('body', data.body)
@@ -265,6 +268,12 @@ async function sendEmail(): Promise<void> {
     } catch (error) {
         console.log(error)
     }
+}
+const caculatorMark = () => {
+    return (
+        ((50 - state.studentActive.incorrerAnswer.length) / 50) *
+        10
+    ).toFixed(1)
 }
 </script>
 
@@ -346,105 +355,154 @@ async function sendEmail(): Promise<void> {
                             />
                         </div>
                     </template>
-                    <div class="p-4 h-fit">
-                        <UTabs
-                            :items="state.students"
-                            @change="onMarkStudent"
-                            orientation="horizontal"
-                            :ui="{
-                                container: 'relative w-full',
-                                wrapper: 'flex items-center gap-4 ',
-                                list: {
-                                    width: 'w-full',
-                                    tab: { height: 'h-8' },
-                                },
-                            }"
-                        />
-                    </div>
-
-                    <div
-                        class="flex flex-col gap-2 overflow-hidden h-[600px] p-1"
-                    >
-                        <UProgress v-if="state.loading" animation="carousel" />
-                        <div class="flex justify-end gap-4">
-                            <UButton class="w-fit" @click="generateHTMLToPDF"
-                                >Tải bản PDF lời giải</UButton
+                    <div class="flex">
+                        <div class="p-4 h-fit">
+                            <UTabs
+                                :items="state.students"
+                                @change="onMarkStudent"
+                                orientation="vertical"
+                                :ui="{
+                                    container: 'relative w-full',
+                                    wrapper: 'flex items-center gap-4',
+                                    list: {
+                                        width: 'w-[240px]',
+                                        tab: { height: 'h-8' },
+                                    },
+                                }"
                             >
-                            <UFormGroup name="code" eager-validation required>
-                                <UInput
-                                    v-model="state.emailtest"
-                                    placeholder="Nhập email đích để test"
-                                />
-                            </UFormGroup>
-                            <UButton class="w-fit" @click="sendEmail"
-                                >Gửi kết lời giải qua Email</UButton
-                            >
-                        </div>
-                        <div
-                            class="shadow-[0_0_1px_#7a7a7a] rounded-sm p-4 flex-1 overflow-y-scroll"
-                        >
-                            <h2
-                                class="font-semibold text-[#3973ca] text-4xl text-center"
-                            >
-                                PHIẾU DẶN DÒ YÊU THƯƠNG
-                            </h2>
-                            <div
-                                class="grid grid-cols-3 px-2 gap-3 mt-3 font-semibold text-[#3973ca]"
-                            >
-                                <p>
-                                    Họ và tên:
-                                    <span
-                                        v-if="state.studentActive['HO VA TEN']"
-                                        >{{
-                                            state.studentActive['HO VA TEN']
-                                        }}</span
+                                <template #pdf>
+                                    <div
+                                        class="flex flex-col gap-2 overflow-hidden h-[600px] p-1"
                                     >
-                                </p>
-                                <p>
-                                    Số báo danh:
-                                    <span
-                                        v-if="
-                                            state.studentActive['SO BAO DANH']
-                                        "
-                                        >{{
-                                            state.studentActive['SO BAO DANH']
-                                        }}</span
-                                    >
-                                </p>
-                                <p>Cơ sở: NQH Q10</p>
-                                <p>
-                                    Điểm bài thi:
-                                    <span v-if="state.studentActive['DIEM']">{{
-                                        state.studentActive['DIEM']
-                                    }}</span>
-                                </p>
-                                <p>Học sinh đang học tại NQH: Có</p>
-                                <p>
-                                    Mã đề:
-                                    <span v-if="state.studentActive['MA DE']">{{
-                                        state.studentActive['MA DE']
-                                    }}</span>
-                                </p>
-                            </div>
-                            <p
-                                class="font-semibold text-[#313131] text-2xl text-center mt-3"
+                                        <UProgress
+                                            v-if="state.loading"
+                                            animation="carousel"
+                                        />
+                                        <div class="flex justify-end gap-4">
+                                            <UButton
+                                                class="w-fit"
+                                                @click="generateHTMLToPDF"
+                                                >Tải bản PDF lời giải</UButton
+                                            >
+                                            <UFormGroup
+                                                name="code"
+                                                eager-validation
+                                                required
+                                            >
+                                                <UInput
+                                                    v-model="state.emailtest"
+                                                    placeholder="Nhập email đích để test"
+                                                />
+                                            </UFormGroup>
+                                            <UButton
+                                                class="w-fit"
+                                                @click="sendEmail"
+                                                >Gửi kết lời giải qua
+                                                Email</UButton
+                                            >
+                                        </div>
+                                        <div
+                                            class="shadow-[0_0_1px_#7a7a7a] rounded-sm p-4 flex-1 overflow-y-scroll"
+                                        >
+                                            <h2
+                                                class="font-semibold text-[#3973ca] text-4xl text-center"
+                                            >
+                                                PHIẾU DẶN DÒ YÊU THƯƠNG
+                                            </h2>
+                                            <div
+                                                class="grid grid-cols-3 px-2 gap-3 mt-3 font-semibold text-[#3973ca]"
+                                            >
+                                                <p>
+                                                    Họ và tên:
+                                                    <span
+                                                        v-if="
+                                                            state.studentActive[
+                                                                'Họ và Tên'
+                                                            ]
+                                                        "
+                                                        >{{
+                                                            state.studentActive[
+                                                                'Họ và Tên'
+                                                            ]
+                                                        }}</span
+                                                    >
+                                                </p>
+                                                <p>
+                                                    Số báo danh:
+                                                    <span
+                                                        v-if="
+                                                            state.studentActive[
+                                                                'Số Báo Danh'
+                                                            ]
+                                                        "
+                                                        >{{
+                                                            state.studentActive[
+                                                                'Số Báo Danh'
+                                                            ]
+                                                        }}</span
+                                                    >
+                                                </p>
+                                                <p>Cơ sở: NQH Q10</p>
+                                                <p>
+                                                    Điểm bài thi:
+                                                    <span
+                                                        v-if="
+                                                            state.studentActive
+                                                                .incorrerAnswer
+                                                                .length
+                                                        "
+                                                    >
+                                                        {{
+                                                            caculatorMark()
+                                                        }}</span
+                                                    >
+                                                    <span v-else> 10</span>
+                                                </p>
+                                                <p>
+                                                    Học sinh đang học tại NQH:
+                                                    Có
+                                                </p>
+                                                <p>
+                                                    Mã đề:
+                                                    <span
+                                                        v-if="
+                                                            state.studentActive[
+                                                                'Mã đề'
+                                                            ]
+                                                        "
+                                                        >{{
+                                                            state.studentActive[
+                                                                'Mã đề'
+                                                            ]
+                                                        }}</span
+                                                    >
+                                                </p>
+                                            </div>
+                                            <p
+                                                class="font-semibold text-[#313131] text-2xl text-center mt-3"
+                                            >
+                                                Những nội dung con cần ôn tập
+                                                thêm - Đề số: 2
+                                            </p>
+                                            <ol class="list-decimal p-5">
+                                                <li
+                                                    v-for="item in state
+                                                        .studentActive
+                                                        .incorrerAnswer"
+                                                >
+                                                    <a
+                                                        href="https://www.google.co.uk/"
+                                                        class="underline text-[#3973ca]"
+                                                    >
+                                                        {{ item['Câu Hỏi'] }} -
+                                                        {{ item['Giải pháp'] }}
+                                                    </a>
+                                                </li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </template></UTabs
                             >
-                                Những nội dung con cần ôn tập thêm - Đề số: 2
-                            </p>
-                            <ol class="list-decimal p-5">
-                                <li
-                                    v-for="item in state.studentActive
-                                        .incorrerAnswer"
-                                >
-                                    <a
-                                        href="https://www.google.co.uk/"
-                                        class="underline text-[#3973ca]"
-                                    >
-                                        {{ item['Câu Hỏi'] }} -
-                                        {{ item['Giải pháp'] }}
-                                    </a>
-                                </li>
-                            </ol>
                         </div>
                     </div>
                 </UCard>
@@ -457,7 +515,7 @@ async function sendEmail(): Promise<void> {
                 :state="state"
                 :validate="validate"
                 @submit="onSubmit"
-                class="flex gap-3 flex-wrap"
+                class="flex gap-3 flex-wrap items-start"
             >
                 <UFormGroup
                     label="Tải lên file csv"
@@ -477,7 +535,7 @@ async function sendEmail(): Promise<void> {
                     <UInput v-model="state.code" placeholder="Nhập mã đề" />
                 </UFormGroup>
                 <div class="flex flex-1 items-end justify-end">
-                    <UButton type="submit" class="h-fit"
+                    <UButton type="submit" class="h-fit mt-6"
                         >Kiểm tra và sửa bài</UButton
                     >
                 </div>
