@@ -95,7 +95,7 @@ const rows = computed(() => {
     return data
 })
 
-const loadPdf = () => {
+const loadPdf = async () => {
     const pdfMaker = $pdfMake as any
     pdfMaker.tableLayouts = {
         custom: {
@@ -186,7 +186,7 @@ async function onSubmit(event: any) {
 
 async function sendEmail(): Promise<void> {
     state.loading = true
-    loadPdf()
+    await loadPdf()
     const data: IFormData = {
         name: state.studentActive,
         email: state.emailtest,
