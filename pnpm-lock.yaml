@@ -26,6 +26,9 @@ dependencies:
   csv-parse:
     specifier: ^5.5.5
     version: 5.5.5
+  dotenv:
+    specifier: ^16.4.5
+    version: 16.4.5
   firebase:
     specifier: 9.22.0
     version: 9.22.0

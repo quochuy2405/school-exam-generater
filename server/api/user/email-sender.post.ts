@@ -1,7 +1,8 @@
 import { OAuth2Client } from 'google-auth-library'
 import handlebars from 'handlebars'
 import * as nodemailer from 'nodemailer'
-
+import dotenv from 'dotenv'
+dotenv.config()
 interface IEmailData {
     source: string
     head: { to: string; subject: string }

@@ -51,6 +51,7 @@ const state = reactive({
     studentActive: undefined as any,
     answer: [] as any,
     pdf: [] as any,
+    loading: false,
 })
 const page = ref(1)
 const pageCount = 10
@@ -184,6 +185,7 @@ async function onSubmit(event: any) {
 }
 
 async function sendEmail(): Promise<void> {
+    state.loading = true
     loadPdf()
     const data: IFormData = {
         name: state.studentActive,
@@ -218,11 +220,13 @@ async function sendEmail(): Promise<void> {
     try {
         $fetch('/api/user/email-sender', requestInit)
             .then((data) => {
-              
                 successMessage.value = 'Email has been sent.'
             })
             .catch((error) => {
                 console.log('error', error)
+            })
+            .finally(() => {
+                state.loading = false
             })
     } catch (error) {
         console.log(error)
@@ -327,6 +331,7 @@ async function sendEmail(): Promise<void> {
                     <div
                         class="flex flex-col gap-2 overflow-hidden h-[600px] p-1"
                     >
+                        <UProgress v-if="state.loading" animation="carousel" />
                         <div class="flex justify-end gap-4">
                             <UButton class="w-fit" @click="generateHTMLToPDF"
                                 >Tải bản PDF lời giải</UButton
