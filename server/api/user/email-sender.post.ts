@@ -9,19 +9,15 @@ interface IEmailData {
     pdf?: any
     fileName?: any
 }
-const GOOGLE_MAILER_CLIENT_ID =
-    '434231631925-a6e8h6s0e5d9l6kj12rp2iq76ca6knr4.apps.googleusercontent.com'
-const GOOGLE_MAILER_CLIENT_SECRET = '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'
-const GOOGLE_MAILER_REFRESH_TOKEN =
-    '1//04-HL2-d6pPS9CgYIARAAGAQSNwF-L9IrZTMFWK5KVaMIZ2ROVR79izPtnYISPOoiwHmHVeuPlSYnOHNH5ED9x0L48glEonM2KIE'
+
 const myOAuth2Client = new OAuth2Client(
-    GOOGLE_MAILER_CLIENT_ID,
-    GOOGLE_MAILER_CLIENT_SECRET,
+    process.env.GOOGLE_MAILER_CLIENT_ID,
+    process.env.GOOGLE_MAILER_CLIENT_SECRET,
     'https://developers.google.com/oauthplayground',
 )
 
 myOAuth2Client.setCredentials({
-    refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+    refresh_token: process.env.GOOGLE_MAILER_REFRESH_TOKEN,
 })
 
 const sendMail = async (data: IEmailData): Promise<void> => {
@@ -35,9 +31,9 @@ const sendMail = async (data: IEmailData): Promise<void> => {
         auth: {
             type: 'OAuth2',
             user: 'work.huypui@gmail.com',
-            clientId: GOOGLE_MAILER_CLIENT_ID,
-            clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
-            refreshToken: GOOGLE_MAILER_REFRESH_TOKEN,
+            clientId: process.env.GOOGLE_MAILER_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_MAILER_CLIENT_SECRET,
+            refreshToken: process.env.GOOGLE_MAILER_REFRESH_TOKEN,
             accessToken,
             expires: 1484314697598,
         },
