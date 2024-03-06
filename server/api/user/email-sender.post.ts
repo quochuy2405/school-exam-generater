@@ -12,16 +12,16 @@ interface IEmailData {
 
 const sendMail = async (data: IEmailData): Promise<void> => {
     const config = useRuntimeConfig()
-    const myOAuth2Client = new OAuth2Client(
+    const oAuthClient = new OAuth2Client(
         config.public.google.GOOGLE_MAILER_CLIENT_ID,
         config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
         'https://developers.google.com/oauthplayground'
     )
 
-    myOAuth2Client.setCredentials({
+    oAuthClient.setCredentials({
         refresh_token: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
     })
-    const getAccessTokenObject = await myOAuth2Client.getAccessToken()
+    const getAccessTokenObject = await oAuthClient.getAccessToken()
     const accessToken = getAccessTokenObject?.token
     const transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -94,6 +94,20 @@ export default defineEventHandler(async (event) => {
                 body: emailBody,
                 pdf: pdf,
                 fileName,
+            })
+                .then(() => {
+                    return 200
+                })
+                .catch((error) => {
+                    return createError({
+                        statusCode: 500,
+                        statusMessage: error,
+                    })
+                })
+        } else {
+            return createError({
+                statusCode: 500,
+                statusMessage: 'source not found',
             })
         }
         return 200 // Success
