@@ -79,9 +79,7 @@ export default defineEventHandler(async (event) => {
         const body = bodyJson.subject.toString()
         const pdf = bodyJson.pdf
         // const keys = useStorage().getKeys() - Get list of all keys available to your app.
-        const source = await useStorage().getItem(
-            'root:assets:email-templates:email.html'
-        )
+        const source = await useStorage('system').getItem('email.html')
         const emailHeading: { to: string; subject: string } = {
             to: email,
             subject: subject,

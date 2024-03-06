@@ -24,14 +24,13 @@ export default defineNuxtConfig({
                 'mongodb+srv://workhuypui:workhuypui@nqhschool.5r2gsq5.mongodb.net/nqhschool',
         },
     },
-    // nitro: {
-    //     preset: 'vercel-edge',
-    //     vercel: {
-    //         regions: ['iad1'],
-    //     },
-    // },
-    // nitro: {
-    //     plugins: ['~/server/plugins/mongodb.ts'],
-    //     preset: 'vercel_edge',
-    // },
+    nitro: {
+        storage: {
+            system: {
+                // pass this key - 'myFileSystem' - into useStorage while accessing the .json file
+                driver: 'fs',
+                base: 'assets/email-templates/', // make sure your `test.json` exists at this location
+            },
+        },
+    },
 })
