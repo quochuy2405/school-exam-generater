@@ -29,7 +29,7 @@ export default defineNuxtConfig({
             system: {
                 // pass this key - 'myFileSystem' - into useStorage while accessing the .json file
                 driver: 'fs',
-                base: 'assets/email-templates/', // make sure your `test.json` exists at this location
+                base: './assets/email-templates/', // make sure your `test.json` exists at this location
             },
         },
     },
