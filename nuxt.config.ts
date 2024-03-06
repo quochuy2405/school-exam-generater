@@ -26,5 +26,6 @@ export default defineNuxtConfig({
     },
     nitro: {
         plugins: ['~/server/plugins/mongodb.ts'],
+        preset: 'vercel',
     },
 })
