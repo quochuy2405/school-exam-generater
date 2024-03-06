@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { create } from '@/composables/firebase/base'
-import { db } from '@/composables/firebase/config'
-import { collection } from 'firebase/firestore'
 import { z } from 'zod'
 
 definePageMeta({
@@ -11,8 +8,6 @@ definePageMeta({
     },
 })
 
-const classes = ['Lớp 1', 'Lớp 2', 'Lớp 3']
-const types = ['Loại 1', 'Loại 2', 'Loại 3']
 const columns = [
     {
         key: 'STT',
@@ -73,7 +68,7 @@ const handleChangeFile = (event: any) => {
 const rows = computed(() => {
     const data = state.excercies?.slice(
         (page.value - 1) * pageCount,
-        page.value * pageCount,
+        page.value * pageCount
     )
     return data
 })
@@ -97,17 +92,18 @@ async function onSubmit(event: any) {
         return
     }
 
-    const topicsRef = collection(db, 'topics')
     const dataCreate = {
         code: event.data.code,
         excercies: { ...event.data.excercies },
     }
-    create(topicsRef, { ...dataCreate })
+    $fetch('/api/exam/add', {
+        method: 'POST',
+        body: dataCreate,
+    })
         .then(() => {
             toast.add({ title: 'Đã tạo dữ liệu thành công', timeout: 3000 })
         })
         .catch((e) => {
-    
             toast.add({ title: 'Lỗi', timeout: 3000 })
         })
 }

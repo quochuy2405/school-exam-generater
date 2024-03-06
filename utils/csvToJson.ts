@@ -6,7 +6,7 @@ export const csvToJson = (csv: string) => {
         .filter((header) => !!header?.trim())
         .map((item) => item?.trim())
 
-    for (let i = 2; i < lines.length; i++) {
+    for (let i = 1; i < lines.length; i++) {
         const obj: any = {}
         const currentLine = lines[i].split(',')
 

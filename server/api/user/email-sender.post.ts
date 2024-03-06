@@ -14,7 +14,7 @@ interface IEmailData {
 const myOAuth2Client = new OAuth2Client(
     process.env.GOOGLE_MAILER_CLIENT_ID,
     process.env.GOOGLE_MAILER_CLIENT_SECRET,
-    'https://developers.google.com/oauthplayground',
+    'https://developers.google.com/oauthplayground'
 )
 
 myOAuth2Client.setCredentials({
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
         const pdf = bodyJson.pdf
         // const keys = useStorage().getKeys() - Get list of all keys available to your app.
         const source = await useStorage().getItem(
-            'root:assets:email-templates:email.html',
+            'root:assets:email-templates:email.html'
         )
         const emailHeading: { to: string; subject: string } = {
             to: email,
@@ -99,7 +99,6 @@ export default defineEventHandler(async (event) => {
         }
         return 200 // Success
     } catch (error: unknown) {
-        console.log(error)
         return createError({
             statusCode: 500,
             statusMessage: 'Something went wrong.',

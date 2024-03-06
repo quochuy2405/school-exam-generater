@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { create, findAll } from '@/composables/firebase/base'
-import { db } from '@/composables/firebase/config'
-import { collection } from 'firebase/firestore'
 import { z } from 'zod'
 
 definePageMeta({
@@ -57,7 +54,7 @@ const pageCount = 20
 const rows = computed(() => {
     const data = state.excercies?.slice(
         (page.value - 1) * pageCount,
-        page.value * pageCount,
+        page.value * pageCount
     )
     return data
 })
@@ -75,10 +72,16 @@ const validate = (state: any): any[] => {
 
 async function onSubmit(event: any) {
     // Do something with data
-    const topicsRef = collection(db, 'topics')
-    findAll(topicsRef, [['code', event.data.code]]).then((data: any) => {
-        if (data.length) state.excercies = Object.values(data[0].excercies)
-    })
+    const body = {
+        code: event.data.code,
+    }
+    $fetch('/api/exam/find', { method: 'POST', body })
+        .then((response: any) => {
+            state.excercies = Object.values(response[0].excercies)
+        })
+        .catch(() => {
+            toast.add({ title: 'Không tìm thấy', timeout: 3000 })
+        })
 }
 </script>
 

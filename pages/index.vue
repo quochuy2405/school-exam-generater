@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { findAll } from '@/composables/firebase/base'
-import { db } from '@/composables/firebase/config'
 import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
-import { collection } from 'firebase/firestore'
 import { z } from 'zod'
+import { studentColumns } from '@/constants/student'
 import type { IFormData } from '../types'
 
 definePageMeta({
@@ -13,28 +11,6 @@ definePageMeta({
     },
 })
 
-const columns = [
-    {
-        key: 'Họ và Tên',
-        label: 'Họ và Tên',
-        class: 'w-[120px]',
-    },
-    {
-        key: 'Số Báo Danh',
-        label: 'Số Báo Danh',
-        class: 'w-[100px]',
-    },
-    {
-        key: 'Mã đề',
-        label: 'Mã đề',
-        class: 'w-[60px]',
-    },
-    {
-        key: 'Điểm',
-        label: 'Điểm',
-        class: 'w-[120px]',
-    },
-]
 const { $pdfMake } = useNuxtApp()
 const toast = useToast()
 const successMessage = ref<string | null>(null)
@@ -71,7 +47,7 @@ const handleChangeFile = (event: any) => {
                 label: `Câu ${item}`,
                 class: 'w-[60px]',
             }))
-        state.columns = [...columns, ...colsAdding]
+        state.columns = [...studentColumns, ...colsAdding]
         state.excercies = [...jsonData]
         state.studentActive = state.excercies[0]
 
@@ -91,7 +67,7 @@ const handleChangeFile = (event: any) => {
 const rows = computed(() => {
     const data = state.excercies?.slice(
         (page.value - 1) * pageCount,
-        page.value * pageCount,
+        page.value * pageCount
     )
     return data
 })
@@ -124,7 +100,7 @@ const loadPdf = async () => {
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         base64ToPDF(
             base64Data.replace('data:application/pdf;base64,', ''),
-            filename,
+            filename
         )
     })
 }
@@ -157,7 +133,7 @@ const dowloadPdf = async () => {
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         const blob = base64ToPDF(
             base64Data.replace('data:application/pdf;base64,', ''),
-            filename,
+            filename
         )
         const url = URL.createObjectURL(blob)
 
@@ -211,14 +187,25 @@ async function onSubmit(event: any) {
 
         return
     }
-    // Do something with data
-    const topicsRef = collection(db, 'topics')
-    findAll(topicsRef, [['code', event.data.code]]).then((data: any) => {
-        if (data.length) state.answer = Object.values(data[0].excercies)
-        onMarkStudent(0)
-        loadPdf()
-        isOpen.value = true
-    })
+    state.loading = true
+    const body = {
+        code: event.data.code,
+    }
+    $fetch('/api/exam/find', { method: 'POST', body })
+        .then((response: any) => {
+            if (response.length)
+                state.answer = Object.values(response[0].excercies)
+            onMarkStudent(0)
+            loadPdf()
+            isOpen.value = true
+        })
+        .catch(() => {
+            toast.add({ title: 'Không tìm thấy', timeout: 3000 })
+            isOpen.value = false
+        })
+        .finally(() => {
+            state.loading = false
+        })
 }
 
 async function sendEmail(): Promise<void> {
@@ -535,7 +522,10 @@ const caculatorMark = () => {
                     <UInput v-model="state.code" placeholder="Nhập mã đề" />
                 </UFormGroup>
                 <div class="flex flex-1 items-end justify-end">
-                    <UButton type="submit" class="h-fit mt-6"
+                    <UButton
+                        type="submit"
+                        class="h-fit mt-6"
+                        :loading="state.loading"
                         >Kiểm tra và sửa bài</UButton
                     >
                 </div>
