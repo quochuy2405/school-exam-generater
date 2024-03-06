@@ -16,7 +16,7 @@ export default defineNuxtConfig({
                 GOOGLE_MAILER_REFRESH_TOKEN:
                     '1//04-HL2-d6pPS9CgYIARAAGAQSNwF-L9IrZTMFWK5KVaMIZ2ROVR79izPtnYISPOoiwHmHVeuPlSYnOHNH5ED9x0L48glEonM2KIE',
             },
-            apiSecret: {
+            email: {
                 EMAIL_USER: 'work.huypui@gmail.com',
                 EMAIL_PASS: '240501@@@@',
             },

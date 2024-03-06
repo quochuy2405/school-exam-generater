@@ -32,7 +32,7 @@ const sendMail = async (data: IEmailData): Promise<void> => {
         secure: true,
         auth: {
             type: 'OAuth2',
-            user: 'work.huypui@gmail.com',
+            user: config.public.email.EMAIL_USER,
             clientId: config.public.google.GOOGLE_MAILER_CLIENT_ID,
             clientSecret: config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
             refreshToken: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
