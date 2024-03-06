@@ -13,7 +13,6 @@
         "@nuxt/kit": "^3.10.3",
         "@nuxt/ui": "^2.14.1",
         "@nuxtjs/svg": "^0.4.0",
-        "dotenv": "^16.4.5",
         "html-to-pdfmake": "^2.5.2",
         "mongoose": "^8.2.1",
         "nitropack": "^2.9.1",

@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library'
 import handlebars from 'handlebars'
 import * as nodemailer from 'nodemailer'
-const config = useRuntimeConfig()
+
 interface IEmailData {
     source: string
     head: { to: string; subject: string }
@@ -10,17 +10,17 @@ interface IEmailData {
     fileName?: any
 }
 
-const myOAuth2Client = new OAuth2Client(
-    config.public.google.GOOGLE_MAILER_CLIENT_ID,
-    config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
-    'https://developers.google.com/oauthplayground'
-)
-
-myOAuth2Client.setCredentials({
-    refresh_token: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
-})
-
 const sendMail = async (data: IEmailData): Promise<void> => {
+    const config = useRuntimeConfig()
+    const myOAuth2Client = new OAuth2Client(
+        config.public.google.GOOGLE_MAILER_CLIENT_ID,
+        config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
+        'https://developers.google.com/oauthplayground'
+    )
+
+    myOAuth2Client.setCredentials({
+        refresh_token: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
+    })
     const getAccessTokenObject = await myOAuth2Client.getAccessToken()
     const accessToken = getAccessTokenObject?.token
     const transporter = nodemailer.createTransport({
