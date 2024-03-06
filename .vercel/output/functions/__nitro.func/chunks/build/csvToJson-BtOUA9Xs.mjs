@@ -1,10 +1,11 @@
 const csvToJson = (csv) => {
-  const lines = csv.split("\r\n");
+  var _a, _b, _c, _d;
+  const lines = csv == null ? void 0 : csv.split("\r\n");
   const result = [];
-  const headers = lines[0].split(",").filter((header) => !!(header == null ? void 0 : header.trim())).map((item) => item == null ? void 0 : item.trim());
+  const headers = (_c = (_b = (_a = lines[0]) == null ? void 0 : _a.split(",")) == null ? void 0 : _b.filter((header) => !!(header == null ? void 0 : header.trim()))) == null ? void 0 : _c.map((item) => item == null ? void 0 : item.trim());
   for (let i = 1; i < lines.length; i++) {
     const obj = {};
-    const currentLine = lines[i].split(",");
+    const currentLine = (_d = lines[i]) == null ? void 0 : _d.split(",");
     for (let j = 0; j < headers.length; j++) {
       if (currentLine[j]) {
         obj[headers[j]] = currentLine[j];
@@ -157,4 +158,4 @@ const generateContent = (student, anwers, mark) => {
 };
 
 export { csvToJson as c, generateContent as g, readLinesFromCSV as r };
-//# sourceMappingURL=csvToJson-CDo2sGfG.mjs.map
+//# sourceMappingURL=csvToJson-BtOUA9Xs.mjs.map

@@ -5027,7 +5027,7 @@ const _routes = [
     meta: __nuxt_page_meta$3 || {},
     alias: (__nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.alias) || [],
     redirect: __nuxt_page_meta$3 == null ? void 0 : __nuxt_page_meta$3.redirect,
-    component: () => import('./index-DOiAQTmX.mjs').then((m) => m.default || m)
+    component: () => import('./index-BDnky8e0.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta$2 == null ? void 0 : __nuxt_page_meta$2.name) ?? "kiemtrade",
@@ -5043,7 +5043,7 @@ const _routes = [
     meta: __nuxt_page_meta$1 || {},
     alias: (__nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.alias) || [],
     redirect: __nuxt_page_meta$1 == null ? void 0 : __nuxt_page_meta$1.redirect,
-    component: () => import('./nhaplieu-By-ieeoD.mjs').then((m) => m.default || m)
+    component: () => import('./nhaplieu-iH9i0-hd.mjs').then((m) => m.default || m)
   },
   {
     name: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.name) ?? "themhocsinh",
@@ -5051,7 +5051,7 @@ const _routes = [
     meta: __nuxt_page_meta || {},
     alias: (__nuxt_page_meta == null ? void 0 : __nuxt_page_meta.alias) || [],
     redirect: __nuxt_page_meta == null ? void 0 : __nuxt_page_meta.redirect,
-    component: () => import('./themhocsinh-Cjmf4lbh.mjs').then((m) => m.default || m)
+    component: () => import('./themhocsinh-BEt4-LwT.mjs').then((m) => m.default || m)
   }
 ];
 const _wrapIf = (component, props, slots) => {
@@ -5314,7 +5314,7 @@ const cfg0 = defineAppConfig({
 });
 const inlineConfig = {
   "nuxt": {
-    "buildId": "0f6a0a11-1181-47ff-a39f-6811640d17c7"
+    "buildId": "7ec0d162-02d2-45fd-8e2f-f103321fbb03"
   },
   "ui": {
     "primary": "green",
