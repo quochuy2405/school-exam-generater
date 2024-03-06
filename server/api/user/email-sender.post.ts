@@ -11,49 +11,53 @@ interface IEmailData {
 }
 
 const sendMail = async (data: IEmailData): Promise<void> => {
-    const config = useRuntimeConfig()
-    const oAuthClient = new OAuth2Client(
-        config.public.google.GOOGLE_MAILER_CLIENT_ID,
-        config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
-        'https://developers.google.com/oauthplayground'
-    )
+    try {
+        const config = useRuntimeConfig()
+        const oAuthClient = new OAuth2Client(
+            config.public.google.GOOGLE_MAILER_CLIENT_ID,
+            config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
+            'https://developers.google.com/oauthplayground'
+        )
 
-    oAuthClient.setCredentials({
-        refresh_token: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
-    })
-    const getAccessTokenObject = await oAuthClient.getAccessToken()
-    const accessToken = getAccessTokenObject?.token
-    const transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: true,
-        auth: {
-            type: 'OAuth2',
-            user: config.public.email.EMAIL_USER,
-            clientId: config.public.google.GOOGLE_MAILER_CLIENT_ID,
-            clientSecret: config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
-            refreshToken: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
-            accessToken,
-            expires: 1484314697598,
-        },
-    } as any)
-    const compileSource = handlebars.compile(data.source)
-    const mailOptions = {
-        from: 'Trung tâm NQH <work.huypui@gmail.com>',
-        to: data.head.to,
-        subject: data.head.subject,
-        html: compileSource(data.body),
-        attachments: [
-            {
-                // utf-8 string as an attachment
-                filename: data.fileName,
-                content: data.pdf,
+        oAuthClient.setCredentials({
+            refresh_token: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
+        })
+        const getAccessTokenObject = await oAuthClient.getAccessToken()
+        const accessToken = getAccessTokenObject?.token
+        const transporter = nodemailer.createTransport({
+            service: 'Gmail',
+            host: 'smtp.gmail.com',
+            port: 587,
+            secure: true,
+            auth: {
+                type: 'OAuth2',
+                user: config.public.email.EMAIL_USER,
+                clientId: config.public.google.GOOGLE_MAILER_CLIENT_ID,
+                clientSecret: config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
+                refreshToken: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
+                accessToken,
+                expires: 1484314697598,
             },
-        ],
-    }
+        } as any)
+        const compileSource = handlebars.compile(data.source)
+        const mailOptions = {
+            from: 'Trung tâm NQH <work.huypui@gmail.com>',
+            to: data.head.to,
+            subject: data.head.subject,
+            html: compileSource(data.body),
+            attachments: [
+                {
+                    // utf-8 string as an attachment
+                    filename: data.fileName,
+                    content: data.pdf,
+                },
+            ],
+        }
 
-    await transporter.sendMail(mailOptions)
+        await transporter.sendMail(mailOptions)
+    } catch (error) {
+        throw error
+    }
 }
 export default defineEventHandler(async (event) => {
     try {
