@@ -40,7 +40,7 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
 
         const lineToRead = lines[i]
         const dataLineSplit = lineToRead.split(',')
-        console.log('dataLineSplit[0]', dataLineSplit[0])
+
         if (!dataLineSplit[0]) continue
         const jsonDataLine = csvLineToJson(dataLineSplit, header) // Chuyển đổi dòng CSV thành JSON
 
@@ -67,11 +67,7 @@ const csvLineToJson = (dataLineSplit: Array<string>, header: any) => {
     return entry
 }
 
-export const generateContent = (
-    student: any,
-    anwers: Array<any>,
-    mark: string,
-) => {
+export const generateContent = (student: any, anwers: Array<any>, mark: string) => {
     const ol = anwers.map((item) => ({
         text: `${item.question} (Bấm để xem đáp án)`,
         link: item.link,
