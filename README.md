@@ -23,7 +23,7 @@
  3. Tạo file pdf hướng dẫn làm bài và cho phép tải về máy.
  4. Gửi kết quả bài làm và tính kèm file pdf qua email học sinh.
  5. Quản lý học sinh và lưu lịch sử bài làm của học sinh.
-6. Dọc dữ liệu đề mới và đưa vào cơ sở dũ liệu
+6. Đọc dữ liệu đề mới và đưa vào cơ sở dữ liệu
 ## Yêu cầu hệ thống
 - Nuxt3 version 3.10.3
 - MongoDB
