@@ -3,6 +3,7 @@ import handlebars from 'handlebars'
 import * as nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
 dotenv.config()
+const config = useRuntimeConfig()
 interface IEmailData {
     source: string
     head: { to: string; subject: string }
@@ -12,13 +13,13 @@ interface IEmailData {
 }
 
 const myOAuth2Client = new OAuth2Client(
-    process.env.GOOGLE_MAILER_CLIENT_ID,
-    process.env.GOOGLE_MAILER_CLIENT_SECRET,
+    config.public.google.GOOGLE_MAILER_CLIENT_ID,
+    config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
     'https://developers.google.com/oauthplayground'
 )
 
 myOAuth2Client.setCredentials({
-    refresh_token: process.env.GOOGLE_MAILER_REFRESH_TOKEN,
+    refresh_token: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
 })
 
 const sendMail = async (data: IEmailData): Promise<void> => {
@@ -32,9 +33,9 @@ const sendMail = async (data: IEmailData): Promise<void> => {
         auth: {
             type: 'OAuth2',
             user: 'work.huypui@gmail.com',
-            clientId: process.env.GOOGLE_MAILER_CLIENT_ID,
-            clientSecret: process.env.GOOGLE_MAILER_CLIENT_SECRET,
-            refreshToken: process.env.GOOGLE_MAILER_REFRESH_TOKEN,
+            clientId: config.public.google.GOOGLE_MAILER_CLIENT_ID,
+            clientSecret: config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
+            refreshToken: config.public.google.GOOGLE_MAILER_REFRESH_TOKEN,
             accessToken,
             expires: 1484314697598,
         },

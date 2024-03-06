@@ -45,7 +45,7 @@ const columns = [
 const toast = useToast()
 const state = reactive({
     code: undefined,
-
+    loading: false,
     excercies: [] as any,
 })
 const page = ref(1)
@@ -72,6 +72,7 @@ const validate = (state: any): any[] => {
 
 async function onSubmit(event: any) {
     // Do something with data
+    state.loading = true
     const body = {
         code: event.data.code,
     }
@@ -81,6 +82,9 @@ async function onSubmit(event: any) {
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
+        })
+        .finally(() => {
+            state.loading = false
         })
 }
 </script>
@@ -110,7 +114,10 @@ async function onSubmit(event: any) {
                 </div>
 
                 <div class="flex justify-end">
-                    <UButton type="submit" class="h-fit w-fit px-2"
+                    <UButton
+                        type="submit"
+                        class="h-fit w-fit px-2"
+                        :loading="state.loading"
                         >Tìm kiếm bộ câu hỏi</UButton
                     >
                 </div>

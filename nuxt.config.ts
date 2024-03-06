@@ -7,11 +7,20 @@ export default defineNuxtConfig({
         preference: 'light',
     },
     runtimeConfig: {
-        apiSecret: {
-            EMAIL_USER: process.env.NUXT_MAILER_USER,
-            EMAIL_PASS: process.env.NUXT_MAILER_PASS,
+        public: {
+            google: {
+                GOOGLE_MAILER_CLIENT_ID: process.env.GOOGLE_MAILER_CLIENT_ID,
+                GOOGLE_MAILER_CLIENT_SECRET:
+                    process.env.GOOGLE_MAILER_CLIENT_SECRET,
+                GOOGLE_MAILER_REFRESH_TOKEN:
+                    process.env.GOOGLE_MAILER_REFRESH_TOKEN,
+            },
+            apiSecret: {
+                EMAIL_USER: process.env.NUXT_MAILER_USER,
+                EMAIL_PASS: process.env.NUXT_MAILER_PASS,
+            },
+            mongodbUri: process.env.NUXT_MONGO_DB,
         },
-        mongodbUri: process.env.NUXT_MONGO_DB,
     },
     nitro: {
         plugins: ['~/server/plugins/mongodb.ts'],
