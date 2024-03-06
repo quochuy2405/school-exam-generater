@@ -59,6 +59,32 @@ const sendMail = async (data: IEmailData, event: any): Promise<void> => {
         throw error
     }
 }
+const source = `
+                    <!doctype html>
+                      <html lang="en">
+
+                      <head>
+                        <meta charset="UTF-8" />
+                        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+                        <title>{{subject}}</title>
+                      </head>
+
+                      <body>
+                        <div>
+                          <table>
+                            <tr>
+                              <td>Hello {{name}}</td>
+                            </tr>
+                            <td>
+                              <h3>{{ body }}</h3>
+                            </td>
+                          </table>
+                        </div>
+                      </body>
+
+                      </html>
+                      `
 export default defineEventHandler(async (event) => {
     try {
         const payload: any | null = await readMultipartFormData(event)
@@ -79,7 +105,6 @@ export default defineEventHandler(async (event) => {
         const body = bodyJson.subject.toString()
         const pdf = bodyJson.pdf
         // const keys = useStorage().getKeys() - Get list of all keys available to your app.
-        const source = await useStorage('system').getItem('email.html')
         const emailHeading: { to: string; subject: string } = {
             to: email,
             subject: subject,
@@ -89,32 +114,26 @@ export default defineEventHandler(async (event) => {
             body: body,
         }
 
-        if (source) {
-            await sendMail(
-                {
-                    source: source as string,
-                    head: emailHeading,
-                    body: emailBody,
-                    pdf: pdf,
-                    fileName,
-                },
-                event
-            )
-                .then(() => {
-                    return 200
-                })
-                .catch((error) => {
-                    return createError({
-                        statusCode: 500,
-                        statusMessage: error,
-                    })
-                })
-        } else {
-            return createError({
-                statusCode: 500,
-                statusMessage: 'source not found',
+        await sendMail(
+            {
+                source,
+                head: emailHeading,
+                body: emailBody,
+                pdf: pdf,
+                fileName,
+            },
+            event
+        )
+            .then(() => {
+                return 200
             })
-        }
+            .catch((error) => {
+                return createError({
+                    statusCode: 500,
+                    statusMessage: error,
+                })
+            })
+
         return 200 // Success
     } catch (error: unknown) {
         return createError({
