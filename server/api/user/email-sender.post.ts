@@ -10,9 +10,9 @@ interface IEmailData {
     fileName?: any
 }
 
-const sendMail = async (data: IEmailData): Promise<void> => {
+const sendMail = async (data: IEmailData, event: any): Promise<void> => {
     try {
-        const config = useRuntimeConfig()
+        const config = useRuntimeConfig(event)
         const oAuthClient = new OAuth2Client(
             config.public.google.GOOGLE_MAILER_CLIENT_ID,
             config.public.google.GOOGLE_MAILER_CLIENT_SECRET,
@@ -92,13 +92,16 @@ export default defineEventHandler(async (event) => {
         }
 
         if (source) {
-            await sendMail({
-                source: source as string,
-                head: emailHeading,
-                body: emailBody,
-                pdf: pdf,
-                fileName,
-            })
+            await sendMail(
+                {
+                    source: source as string,
+                    head: emailHeading,
+                    body: emailBody,
+                    pdf: pdf,
+                    fileName,
+                },
+                event
+            )
                 .then(() => {
                     return 200
                 })
