@@ -9,17 +9,19 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             google: {
-                GOOGLE_MAILER_CLIENT_ID: process.env.GOOGLE_MAILER_CLIENT_ID,
+                GOOGLE_MAILER_CLIENT_ID:
+                    '434231631925-a6e8h6s0e5d9l6kj12rp2iq76ca6knr4.apps.googleusercontent.com',
                 GOOGLE_MAILER_CLIENT_SECRET:
-                    process.env.GOOGLE_MAILER_CLIENT_SECRET,
+                    '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',
                 GOOGLE_MAILER_REFRESH_TOKEN:
-                    process.env.GOOGLE_MAILER_REFRESH_TOKEN,
+                    '1//04-HL2-d6pPS9CgYIARAAGAQSNwF-L9IrZTMFWK5KVaMIZ2ROVR79izPtnYISPOoiwHmHVeuPlSYnOHNH5ED9x0L48glEonM2KIE',
             },
             apiSecret: {
-                EMAIL_USER: process.env.NUXT_MAILER_USER,
-                EMAIL_PASS: process.env.NUXT_MAILER_PASS,
+                EMAIL_USER: 'work.huypui@gmail.com',
+                EMAIL_PASS: '240501@@@@',
             },
-            mongodbUri: process.env.NUXT_MONGO_DB,
+            mongodbUri:
+                'mongodb+srv://workhuypui:workhuypui@nqhschool.5r2gsq5.mongodb.net/nqhschool',
         },
     },
     nitro: {
