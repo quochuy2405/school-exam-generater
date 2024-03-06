@@ -24,8 +24,14 @@ export default defineNuxtConfig({
                 'mongodb+srv://workhuypui:workhuypui@nqhschool.5r2gsq5.mongodb.net/nqhschool',
         },
     },
-    nitro: {
-        plugins: ['~/server/plugins/mongodb.ts'],
-        preset: 'vercel_edge',
-    },
+    // nitro: {
+    //     preset: 'vercel-edge',
+    //     vercel: {
+    //         regions: ['iad1'],
+    //     },
+    // },
+    // nitro: {
+    //     plugins: ['~/server/plugins/mongodb.ts'],
+    //     preset: 'vercel_edge',
+    // },
 })
