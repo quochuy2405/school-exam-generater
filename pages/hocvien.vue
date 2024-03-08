@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 definePageMeta({
     layout: 'slot',
     layoutTransition: {
@@ -50,7 +49,7 @@ const pageCount = 20
 const rows = computed(() => {
     const data = state.excercies?.slice(
         (page.value - 1) * pageCount,
-        page.value * pageCount,
+        page.value * pageCount
     )
     return data
 })

@@ -67,7 +67,7 @@ const route = useRoute()
             />
         </svg>
         <svg
-            v-if="href == '/kiemtrade'"
+            v-if="href == '/quanlyde'"
             width="20"
             height="20"
             viewBox="0 0 24 24"
