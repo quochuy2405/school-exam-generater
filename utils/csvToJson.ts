@@ -1,3 +1,4 @@
+import { background, imageHeadPdf } from '@/constants/background'
 export const csvToJson = (csv: string) => {
     const lines = csv?.split('\r\n')
     const result = []
@@ -67,12 +68,17 @@ const csvLineToJson = (dataLineSplit: Array<string>, header: any) => {
     return entry
 }
 
-export const generateContent = (student: any, anwers: Array<any>, mark: string) => {
+export const generateContent = (
+    student: any,
+    anwers: Array<any>,
+    mark: string
+) => {
     const ol = anwers.map((item) => ({
         text: `${item.question} (Bấm để xem đáp án)`,
         link: item.link,
         decoration: 'underline',
-        color: '#3973ca',
+        bold: '900',
+        color: '#0070bb',
         margin: [0, 3],
     }))
     const content = {
@@ -84,54 +90,35 @@ export const generateContent = (student: any, anwers: Array<any>, mark: string) 
             italics: false,
             fontSize: 70,
         },
+        background,
         content: [
-            {
-                layout: 'lightHorizontalLines', // optional
-                table: {
-                    // headers are automatically repeated if the table spans over multiple pages
-                    // you can declare how many rows should be treated as headers
-                    headerRows: 1,
-                    widths: ['*'],
-
-                    body: [
-                        [
-                            {
-                                text: 'PHIẾU DẶN DÒ YÊU THƯƠNG',
-                                bold: true,
-                                alignment: 'center',
-                                fontSize: 22,
-                                color: '#3973ca',
-                            },
-                        ],
-                    ],
-                },
-            },
+            { ...imageHeadPdf },
             {
                 columns: [
                     {
                         width: '*',
-                        text: 'Họ và tên: ' + student['Họ và Tên'],
+                        text: student['Họ và Tên'],
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
-                        color: '#3973ca',
-                        margin: [0, 10],
+                        color: '#0070bb',
+                        absolutePosition: { x: 72, y: 47 },
                     },
                     {
-                        text: 'Số báo danh: ' + student['Số Báo Danh'],
+                        text: student['Số Báo Danh'],
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
-                        color: '#3973ca',
-                        margin: [0, 10],
+                        color: '#0070bb',
+                        absolutePosition: { x: 290, y: 47 },
                     },
                     {
-                        text: 'Cơ sở: NQH Q10',
+                        text: 'Toán',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
-                        color: '#3973ca',
-                        margin: [0, 10],
+                        color: '#0070bb',
+                        absolutePosition: { x: 500, y: 45 },
                     },
                 ],
             },
@@ -139,42 +126,43 @@ export const generateContent = (student: any, anwers: Array<any>, mark: string) 
                 columns: [
                     {
                         width: '*',
-                        text: 'Điểm bài thi: ' + mark,
+                        text: 'THPT Chu Văn An ',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
-                        color: '#3973ca',
+                        color: '#0070bb',
+                        absolutePosition: { x: 65, y: 69 },
                     },
                     {
-                        text: 'Học sinh đang học tại NQH: Có',
+                        text: mark,
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
-                        color: '#3973ca',
+                        color: '#0070bb',
+                        absolutePosition: { x: 350, y: 69 },
                     },
                     {
-                        text: 'Mã đề: ' + student['Mã đề'],
+                        text: 'X',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
-                        color: '#3973ca',
+                        color: '#0070bb',
+                        absolutePosition: { x: 543, y: 71 },
                     },
                 ],
             },
             {
-                text:
-                    'Những nội dung con cần ôn tập thêm - Đề số: ' +
-                    student['Mã đề'],
+                text: student['Mã đề'],
 
                 bold: true,
                 alignment: 'center',
-                fontSize: 16,
-                color: 'black',
-                margin: [0, 10],
+                fontSize: 15,
+                color: '0070bb',
+                absolutePosition: { x: 353, y: 110 },
             },
-
             {
                 ol,
+                absolutePosition: { x: 30, y: 150 },
             },
         ],
     }
