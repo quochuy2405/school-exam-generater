@@ -38,7 +38,7 @@ const columns = [
         class: 'w-[300px]',
     },
     {
-        key: 'Đường dẫn',
+        key: 'Đường Dẫn',
         label: 'Đường dẫn',
     },
 ]
@@ -134,7 +134,7 @@ async function onSubmit(event: any) {
 
 <template>
     <div
-        class="flex h-full flex-col gap-3 w-full overflow-auto px-2 py-1 overflow-hidden"
+        class="flex h-full flex-col gap-3 w-full px-2 py-1 overflow-hidden"
     >
         <UCard>
             <UForm

@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
-import { z } from 'zod'
 import { studentColumns } from '@/constants/student'
+import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
 import type { IFormData } from '../types'
 
 definePageMeta({
@@ -16,7 +15,6 @@ const toast = useToast()
 const successMessage = ref<string | null>(null)
 const isOpen = ref(false)
 const state = reactive({
-    code: undefined,
     class: undefined,
     types: undefined,
     file: undefined,
@@ -89,13 +87,16 @@ const loadPdf = async () => {
             },
         },
     }
+
     // playground requires you to assign document definition to a variable called dd
     const answer = state.studentActive.incorrerAnswer.map((item: any) => ({
         question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
-        link: 'https://www.google.co.uk/',
+        link: item['Đường Dẫn'],
     }))
+
     const filename = `${state.studentActive['Họ và Tên']}(${state.studentActive['Số Báo Danh']})-${state.studentActive['Mã đề']}.pdf`
     const mark = caculatorMark()
+
     const content = generateContent(state.studentActive, answer, mark)
     pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
         base64ToPDF(
@@ -125,7 +126,7 @@ const dowloadPdf = async () => {
     // playground requires you to assign document definition to a variable called dd
     const answer = state.studentActive.incorrerAnswer.map((item: any) => ({
         question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
-        link: 'https://www.google.co.uk/',
+        link: item['Đường Dẫn'],
     }))
     const filename = `${state.studentActive['Họ và Tên']}(${state.studentActive['Số Báo Danh']})-${state.studentActive['Mã đề']}.pdf`
     const mark = caculatorMark()
@@ -163,23 +164,26 @@ const generateHTMLToPDF = async () => {
 }
 const onMarkStudent = (index: number) => {
     const student = state.students[index].value
-    const incorrerAnswer = checkAndGenerateAnswer(student, state.answer)
+    const answer = state.answer.find((item: any) => {
+        return item.code == `${student['Mã đề']}`
+    })
+    const incorrerAnswer = checkAndGenerateAnswer(student, answer)
     state.studentActive = { ...student, incorrerAnswer }
 }
 const onLoadAnswer = () => {
     isOpen.value = false
 }
-const schema = z.object({
-    code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
-})
-const validate = (state: any): any[] => {
-    const errors = []
-    if (!state.code) {
-        errors.push({ path: 'code', message: 'Vui lòng nhập mã đề' })
-    }
+// const schema = z.object({
+//     code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
+// })
+// const validate = (state: any): any[] => {
+//     const errors = []
+//     if (!state.code) {
+//         errors.push({ path: 'code', message: 'Vui lòng nhập mã đề' })
+//     }
 
-    return errors
-}
+//     return errors
+// }
 
 async function onSubmit(event: any) {
     if (!state.file) {
@@ -192,17 +196,33 @@ async function onSubmit(event: any) {
 
         return
     }
+    const codes = state.excercies.map((item: any) => item['Mã đề'])
+    const codesUnique = [...new Set(codes)]
+    if (!codesUnique.length) {
+        toast.add({
+            title: 'Lỗi đọc code',
+            timeout: 3000,
+            icon: 'i-heroicons-exclamation-triangle',
+            color: 'orange',
+        })
+        return
+    }
     state.loading = true
     const body = {
-        code: event.data.code,
+        code: codesUnique,
     }
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
-            if (response.length)
-                state.answer = Object.values(response[0].excercies)
-            onMarkStudent(0)
-            loadPdf()
-            isOpen.value = true
+            console.log('response.length', response.length)
+            if (response.length) {
+                // loadPdf()
+                state.answer = response
+                onMarkStudent(0)
+
+                isOpen.value = true
+            } else {
+                throw ''
+            }
         })
         .catch(() => {
             toast.add({
@@ -229,7 +249,7 @@ async function sendEmail(): Promise<void> {
     }
     successMessage.value = null
 
-    const filename = `${state.studentActive['Số Báo Danh']}-${state.studentActive['Mã đề']}.pdf`
+    const filename = `${state.studentActive['Số Báo Danh']}-${state.studentActive['Mã đề']}-ThucChien1-2-3.pdf`
 
     const headers = new Headers({
         fileName: filename,
@@ -288,56 +308,6 @@ const caculatorMark = () => {
 
 <template>
     <div class="flex h-full flex-col gap-3 w-full overflow-y-hidden px-2 py-1">
-        <div class="w-full bg-white rounded-md flex gap-2">
-            <!-- <div class="flex-1 grid grid-cols-2 gap-4 mt-6">
-                <UCard>
-                    <div
-                        class="flex items-center justify-center gap-4 flex-col"
-                    >
-                        <h2 class="font-medium">SỐ CÂU TRẢ LỜI ĐÚNG</h2>
-                        <svg
-                            width="45"
-                            height="42"
-                            viewBox="0 0 45 42"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M15.6667 22.5833L20.7917 27.3333L29.3333 16.25M43 21C43 23.6775 41.5659 26.0445 39.3707 27.4772C39.8295 29.9287 39.0377 32.5419 36.9952 34.435C34.9527 36.328 32.1332 37.0619 29.4883 36.6367C27.9424 38.671 25.3887 40 22.5 40C19.6114 40 17.0578 38.6711 15.5119 36.6369C12.8665 37.0626 10.0464 36.3287 8.00355 34.4354C5.96074 32.5421 5.16895 29.9283 5.62818 27.4765C3.43365 26.0437 2 23.677 2 21C2 18.3229 3.43377 15.9561 5.62845 14.5233C5.16946 12.0717 5.96129 9.45821 8.00392 7.56503C10.0466 5.67183 12.8664 4.93795 15.5116 5.36339C17.0575 3.32905 19.6113 2 22.5 2C25.3886 2 27.9423 3.32894 29.4882 5.36314C32.1335 4.9375 34.9536 5.67134 36.9965 7.56469C39.0392 9.458 39.831 12.0717 39.3718 14.5235C41.5664 15.9563 43 18.323 43 21Z"
-                                stroke="#00DC82"
-                                stroke-width="3.5"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </div>
-                </UCard>
-                <UCard>
-                    <div
-                        class="flex items-center justify-center gap-4 flex-col"
-                    >
-                        <h2 class="font-medium">SỐ CÂU TRẢ LỜI SAI</h2>
-                        <svg
-                            width="45"
-                            height="45"
-                            viewBox="0 0 45 45"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M26.6633 17.2516L17.8069 27.2187M27.2186 26.6634L17.2516 17.807M37.1857 35.5197C29.8488 43.7767 17.2075 44.5226 8.95054 37.1858C0.693559 29.8489 -0.0523438 17.2076 7.28452 8.95059C14.6214 0.693608 27.2627 -0.0522956 35.5197 7.28457C43.7767 14.6214 44.5226 27.2627 37.1857 35.5197Z"
-                                stroke="#FF1E1E"
-                                stroke-width="4"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            />
-                        </svg>
-                    </div>
-                </UCard>
-            </div> -->
-        </div>
-
-        <!-- <h1 class="font-medium">Hoặc</h1> -->
         <div>
             <USlideover v-model="isOpen">
                 <UCard
@@ -520,9 +490,7 @@ const caculatorMark = () => {
 
         <div class="flex justify-between items-end">
             <UForm
-                :schema="schema"
                 :state="state"
-                :validate="validate"
                 @submit="onSubmit"
                 class="flex gap-3 flex-wrap items-start"
             >
@@ -540,9 +508,9 @@ const caculatorMark = () => {
                         class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
                     />
                 </UFormGroup>
-                <UFormGroup label="Mã đề" name="code" eager-validation required>
+                <!-- <UFormGroup label="Mã đề" name="code" eager-validation required>
                     <UInput v-model="state.code" placeholder="Nhập mã đề" />
-                </UFormGroup>
+                </UFormGroup> -->
                 <div class="flex flex-1 items-end justify-end">
                     <UButton
                         type="submit"
