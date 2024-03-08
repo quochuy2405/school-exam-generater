@@ -87,7 +87,12 @@ const validate = (state: any): any[] => {
 async function onSubmit(event: any) {
     // Do something with data
     if (!state.file) {
-        toast.add({ title: 'Bạn chưa tải file csv', timeout: 3000 })
+        toast.add({
+            title: 'Bạn chưa tải file csv',
+            timeout: 3000,
+            icon: 'i-heroicons-exclamation-triangle',
+            color: 'orange',
+        })
 
         return
     }
@@ -101,10 +106,28 @@ async function onSubmit(event: any) {
         body: dataCreate,
     })
         .then(() => {
-            toast.add({ title: 'Đã tạo dữ liệu thành công', timeout: 3000 })
+            toast.add({
+                title: 'Đã tạo dữ liệu thành công',
+                timeout: 3000,
+                icon: 'i-heroicons-check-circle',
+            })
         })
         .catch((e) => {
-            toast.add({ title: 'Lỗi', timeout: 3000 })
+            if (e.response.status == 409) {
+                toast.add({
+                    title: 'Mã đề đã tồn tại',
+                    timeout: 3000,
+                    icon: 'i-heroicons-exclamation-triangle',
+                    color: 'orange',
+                })
+            } else {
+                toast.add({
+                    title: 'Không tạo được',
+                    timeout: 3000,
+                    icon: 'i-heroicons-exclamation-triangle',
+                    color: 'red',
+                })
+            }
         })
 }
 </script>

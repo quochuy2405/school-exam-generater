@@ -183,7 +183,12 @@ const validate = (state: any): any[] => {
 
 async function onSubmit(event: any) {
     if (!state.file) {
-        toast.add({ title: 'Bạn chưa tải file csv', timeout: 3000 })
+        toast.add({
+            title: 'Bạn chưa tải file csv',
+            timeout: 3000,
+            icon: 'i-heroicons-exclamation-triangle',
+            color: 'orange',
+        })
 
         return
     }
@@ -200,7 +205,12 @@ async function onSubmit(event: any) {
             isOpen.value = true
         })
         .catch(() => {
-            toast.add({ title: 'Không tìm thấy', timeout: 3000 })
+            toast.add({
+                title: 'Không tìm thấy',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+                color: 'orange',
+            })
             isOpen.value = false
         })
         .finally(() => {
@@ -245,9 +255,21 @@ async function sendEmail(): Promise<void> {
         $fetch('/api/user/email-sender', requestInit)
             .then((data) => {
                 successMessage.value = 'Email has been sent.'
+                toast.add({
+                    title: 'Email đã được gửi đi.',
+                    timeout: 3000,
+                    icon: 'i-heroicons-check-circle',
+                })
             })
             .catch((error) => {
                 console.log('error', error)
+                toast.add({
+                    title: 'Gửi email lỗi ',
+                    description: 'Vui lòng kiểm tra lại địa chỉ email.',
+                    timeout: 3000,
+                    icon: 'i-heroicons-exclamation-triangle',
+                    color: 'orange',
+                })
             })
             .finally(() => {
                 state.loading = false

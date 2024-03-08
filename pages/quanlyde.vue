@@ -121,7 +121,13 @@ async function onSubmit(event: any) {
             state.excercies = Object.values(response[0].excercies)
         })
         .catch(() => {
-            toast.add({ title: 'Không tìm thấy', timeout: 3000 })
+            toast.add({
+                title: 'Không tìm thấy',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+                color: 'orange',
+            })
+            state.excercies = undefined
         })
         .finally(() => {
             state.loading = false
