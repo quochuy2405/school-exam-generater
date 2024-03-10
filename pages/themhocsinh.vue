@@ -57,6 +57,7 @@ const state = reactive({
     class: undefined,
     types: undefined,
     file: undefined,
+    loading: false,
     students: [] as any,
 })
 const page = ref(1)
@@ -84,6 +85,7 @@ const rows = computed(() => {
 
 async function onSubmit(event: any) {
     // Do something with data
+
     if (!state.file) {
         toast.add({
             title: 'Bạn chưa tải file csv',
@@ -94,11 +96,9 @@ async function onSubmit(event: any) {
 
         return
     }
+    state.loading = true
+    const dataCreate = state.students.filter((item: any) => item.SBD)
 
-    const dataCreate = {
-        // class: event.data.class,
-        students: state.students,
-    }
     $fetch('/api/student/add', {
         method: 'POST',
         body: dataCreate,
@@ -126,6 +126,9 @@ async function onSubmit(event: any) {
                     color: 'red',
                 })
             }
+        })
+        .finally(() => {
+            state.loading = false
         })
 }
 </script>
@@ -186,24 +189,34 @@ async function onSubmit(event: any) {
         <UForm
             :state="state"
             @submit="onSubmit"
-            class="flex justify-between items-end"
+            class="flex justify-between gap-6 items-end"
         >
-            <UFormGroup
-                label="Tải lên file csv"
-                name="file"
-                class="w-fit"
-                eager-validation
+            <div class="flex justify-start gap-6 items-end">
+                <UFormGroup
+                    label="Tải lên file csv"
+                    name="file"
+                    class="w-fit"
+                    eager-validation
+                >
+                    <input
+                        :model-value="state.file"
+                        @change="handleChangeFile"
+                        type="file"
+                        accept="*"
+                        size="sm"
+                        class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
+                    />
+                </UFormGroup>
+                <!-- <UFormGroup label="Lớp đăng ký" name="class">
+                    <USelect
+                        :options="['Toán', 'Lý', 'Hóa']"
+                        placeholder="Lớp"
+                        class="w-40"
+                /></UFormGroup> -->
+            </div>
+            <UButton :loading="state.loading" type="submit" class="h-fit"
+                >Thêm tất cả học sinh</UButton
             >
-                <input
-                    :model-value="state.file"
-                    @change="handleChangeFile"
-                    type="file"
-                    accept="*"
-                    size="sm"
-                    class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
-                />
-            </UFormGroup>
-            <UButton type="submit" class="h-fit">Thêm tất cả học sinh</UButton>
         </UForm>
         <div
             class="w-full flex-1 flex flex-col h-full bg-white rounded-md shadow-sm border overflow-hidden"

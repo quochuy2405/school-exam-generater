@@ -16,25 +16,23 @@ const toast = useToast()
 const successMessage = ref<string | null>(null)
 const isOpen = ref(false)
 const state = reactive({
-    class: undefined,
-    types: undefined,
     file: undefined,
-    emailtest: '',
     columns: [] as any,
     excercies: [] as any,
     students: [] as any,
     studentActive: undefined as any,
-    tabs: [] as any,
     answer: [] as any,
     pdf: [] as any,
     loading: false,
     zips: [] as any,
+    studentsInfo: {} as any,
     studentEmailCount: 0,
 })
 const page = ref(1)
 const pageCount = 10
-
+let intervalTime: any = undefined
 const handleChangeFile = (event: any) => {
+    if (intervalTime) clearInterval(intervalTime)
     const reader = new FileReader()
     const file = event.target.files[0]
     reader.onload = (e: any) => {
@@ -52,6 +50,7 @@ const handleChangeFile = (event: any) => {
         state.columns = [...studentColumns, ...colsAdding]
         state.excercies = [...jsonData]
         state.studentActive = state.excercies[0]
+
         state.students = state.excercies.map((item: any) => {
             return {
                 label: `${item['Họ và Tên']} (${item['Số Báo Danh']}) - ${item['Mã đề']}`,
@@ -59,6 +58,18 @@ const handleChangeFile = (event: any) => {
                 value: item,
                 slot: 'pdf',
             }
+        })
+        const codes = state.excercies.map((item: any) => item['Số Báo Danh'])
+
+        $fetch('/api/student/find', {
+            method: 'POST',
+            body: { codes },
+        }).then((studentsInfo) => {
+            let keyMap = {}
+            studentsInfo.forEach((item: any) => {
+                keyMap = { ...keyMap, [item.SBD]: item }
+            })
+            state.studentsInfo = keyMap
         })
     }
     reader.readAsText(file)
@@ -123,7 +134,6 @@ const onMarkStudent = (student: any) => {
     const answer = state.answer.find((item: any) => {
         return item.code == `${student['Mã đề']}`
     })
-    console.log('answer', answer)
     const incorrerAnswer = checkAndGenerateAnswer(student, answer)
     return incorrerAnswer
 }
@@ -316,20 +326,25 @@ const downloadAll = async () => {
 const sendAllEmail = () => {
     // state.loading = true
     let index = 0
-    const interval = setInterval(async function () {
+
+    intervalTime = setInterval(async function () {
         if (index < state.excercies.length) {
             const student = state.excercies[index]
-            new Promise((resolve) => {
-                sendEmail(student)
-                resolve(1)
-            }).then(() => {
-                index++
+            const email =
+                state.studentsInfo[Number(student['Số Báo Danh'])]?.['EMAIL']
+
+            if (email) {
+                new Promise((resolve) => {
+                    sendEmail(student, email)
+                    resolve(1)
+                }).then(() => {})
                 state.studentEmailCount = index
-            })
+            }
+            index++
         } else {
             // state.loading = false
             state.studentEmailCount = 0
-            clearInterval(interval)
+            if (intervalTime) clearInterval(intervalTime)
         }
     }, 1000)
 }

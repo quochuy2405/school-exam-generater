@@ -8,31 +8,33 @@ definePageMeta({
 
 const columns = [
     {
-        key: 'Mã học sinh',
-        label: 'Mã học sinh',
+        key: 'SBD',
+        label: 'Số báo danh',
         class: 'w-[120px]',
     },
     {
-        key: 'Tên học sinh',
+        key: 'NAME',
         label: 'Tên học sinh',
         sortable: true,
-        class: 'min-w-[100px]',
+        class: 'w-[200px]',
     },
     {
-        key: 'Email',
+        key: 'EMAIL',
         label: 'Email',
         sortable: true,
-        class: 'min-w-[60px]',
+        class: 'w-[130px]',
     },
     {
-        key: 'Lớp',
-        label: 'Lớp',
+        key: 'SCHOOL',
+        label: 'Trường',
         sortable: true,
         class: 'w-[120px]',
     },
     {
-        key: 'Điểm',
-        label: 'Điểm',
+        key: 'NQH',
+        label: 'Đang học tại NQH',
+        sortable: true,
+        class: 'w-[120px]',
     },
 ]
 
@@ -41,10 +43,12 @@ const state = reactive({
     class: undefined,
     types: undefined,
     file: undefined,
+    loading: false,
     excercies: [] as any,
 })
 const page = ref(1)
 const pageCount = 20
+const toast = useToast()
 
 const rows = computed(() => {
     const data = state.excercies?.slice(
@@ -53,6 +57,53 @@ const rows = computed(() => {
     )
     return data
 })
+const getAll = () => {
+    state.loading = true
+    $fetch('/api/student/all', {
+        method: 'POST',
+    })
+        .then((data) => {
+            state.excercies = data
+        })
+        .catch((e) => {
+            toast.add({
+                title: 'Không có dữ liệu',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+                color: 'red',
+            })
+        })
+        .finally(() => {
+            state.loading = false
+        })
+}
+onMounted(() => {
+    getAll()
+})
+const searchStudent = (event: any) => {
+
+    state.loading = true
+    $fetch('/api/student/search', {
+        method: 'POST',
+        body: {
+            search: event.target.value,
+        },
+    })
+        .then((data) => {
+            state.excercies = data
+        })
+        .catch((e) => {
+            toast.add({
+                title: 'Không có dữ liệu',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+                color: 'red',
+            })
+        })
+        .finally(() => {
+            state.loading = false
+        })
+}
 </script>
 
 <template>
@@ -64,13 +115,19 @@ const rows = computed(() => {
             <div class="flex items-center justify-between gap-3 px-4 py-3">
                 <UInput
                     icon="i-heroicons-magnifying-glass-20-solid"
-                    placeholder="Search..."
+                    placeholder="Tìm kiếm số báo danh..."
+                    @change="searchStudent"
                 />
 
-                <USelectMenu multiple placeholder="Status" class="w-40" />
+                <USelect
+                    :options="['Toán', 'Lý', 'Hóa']"
+                    placeholder="Lớp"
+                    class="w-40"
+                />
             </div>
             <!-- <div class="overflow-auto h-full w-full flex-1"> -->
             <UTable
+                :loading="state.loading"
                 sort-asc-icon="i-heroicons-arrow-up-20-solid"
                 sort-desc-icon="i-heroicons-arrow-down-20-solid"
                 class="relative"
