@@ -2,7 +2,8 @@
 import { studentColumns } from '@/constants/student'
 import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
 import type { IFormData } from '../types'
-
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 definePageMeta({
     layout: 'slot',
     layoutTransition: {
@@ -23,9 +24,12 @@ const state = reactive({
     excercies: [] as any,
     students: [] as any,
     studentActive: undefined as any,
+    tabs: [] as any,
     answer: [] as any,
     pdf: [] as any,
     loading: false,
+    zips: [] as any,
+    studentEmailCount: 0,
 })
 const page = ref(1)
 const pageCount = 10
@@ -48,7 +52,6 @@ const handleChangeFile = (event: any) => {
         state.columns = [...studentColumns, ...colsAdding]
         state.excercies = [...jsonData]
         state.studentActive = state.excercies[0]
-
         state.students = state.excercies.map((item: any) => {
             return {
                 label: `${item['Họ và Tên']} (${item['Số Báo Danh']}) - ${item['Mã đề']}`,
@@ -70,7 +73,7 @@ const rows = computed(() => {
     return data
 })
 
-const loadPdf = async () => {
+const onPdfByStudent = async (student: any, download = false) => {
     const pdfMaker = $pdfMake as any
     pdfMaker.tableLayouts = {
         custom: {
@@ -87,105 +90,48 @@ const loadPdf = async () => {
             },
         },
     }
-
+    const incorrerAnswer = onMarkStudent(student)
+    student.incorrerAnswer = incorrerAnswer
     // playground requires you to assign document definition to a variable called dd
-    const answer = state.studentActive.incorrerAnswer.map((item: any) => ({
+    const answer = student.incorrerAnswer.map((item: any) => ({
         question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
         link: item['Đường Dẫn'],
     }))
 
-    const filename = `${state.studentActive['Họ và Tên']}(${state.studentActive['Số Báo Danh']})-${state.studentActive['Mã đề']}.pdf`
-    const mark = caculatorMark()
+    const mark = caculatorMark(student)
 
-    const content = generateContent(state.studentActive, answer, mark)
-    pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
-        base64ToPDF(
-            base64Data.replace('data:application/pdf;base64,', ''),
-            filename
-        )
-    })
-}
+    const content = generateContent(student, answer, mark)
+    const filename = `${student['Số Báo Danh']}-${student['Mã đề']}-ThucChien1-2-3.pdf`
+    if (download) {
+        pdfMaker.createPdf(content).getBlob((blob: any) => {
+            const url = URL.createObjectURL(blob)
 
-const dowloadPdf = async () => {
-    const pdfMaker = $pdfMake as any
-    pdfMaker.tableLayouts = {
-        custom: {
-            fillColor: function (rowIndex: number) {
-                return rowIndex % 2 !== 0 ? '#00000' : null
-            },
-            hLineColor: '#00000',
-            vLineColor: '#00000',
-            paddingLeft: function () {
-                return 10
-            },
-            paddingRight: function () {
-                return 10
-            },
-        },
+            // Tạo một đường link để tải tệp PDF
+            const link = document.createElement('a')
+            link.href = url
+            link.download = filename || 'loigiai.pdf'
+            link.click()
+
+            // Giải phóng URL đối tượng khi đã sử dụng xong
+            URL.revokeObjectURL(url)
+        })
     }
-    // playground requires you to assign document definition to a variable called dd
-    const answer = state.studentActive.incorrerAnswer.map((item: any) => ({
-        question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
-        link: item['Đường Dẫn'],
-    }))
-    const filename = `${state.studentActive['Họ và Tên']}(${state.studentActive['Số Báo Danh']})-${state.studentActive['Mã đề']}.pdf`
-    const mark = caculatorMark()
-    const content = generateContent(state.studentActive, answer, mark)
-    pdfMaker.createPdf(content).getDataUrl((base64Data: string) => {
-        const blob = base64ToPDF(
-            base64Data.replace('data:application/pdf;base64,', ''),
-            filename
-        )
-        const url = URL.createObjectURL(blob)
+    return { filename, content }
+}
 
-        // Tạo một đường link để tải tệp PDF
-        const link = document.createElement('a')
-        link.href = url
-        link.download = filename || 'loigiai.pdf'
-        link.click()
-
-        // Giải phóng URL đối tượng khi đã sử dụng xong
-        URL.revokeObjectURL(url)
-    })
-}
-const base64ToPDF = (base64Data: any, fileName: string) => {
-    const byteCharacters = atob(base64Data)
-    const byteNumbers = new Array(byteCharacters.length)
-    for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
-    const byteArray = new Uint8Array(byteNumbers)
-    const blob = new Blob([byteArray], { type: 'application/pdf' })
-    state.pdf = blob
-    return blob
-}
-const generateHTMLToPDF = async () => {
-    dowloadPdf()
-}
-const onMarkStudent = (index: number) => {
-    const student = state.students[index].value
+const onMarkStudent = (student: any) => {
     const answer = state.answer.find((item: any) => {
         return item.code == `${student['Mã đề']}`
     })
+    console.log('answer', answer)
     const incorrerAnswer = checkAndGenerateAnswer(student, answer)
-    state.studentActive = { ...student, incorrerAnswer }
+    return incorrerAnswer
 }
 const onLoadAnswer = () => {
     isOpen.value = false
 }
-// const schema = z.object({
-//     code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
-// })
-// const validate = (state: any): any[] => {
-//     const errors = []
-//     if (!state.code) {
-//         errors.push({ path: 'code', message: 'Vui lòng nhập mã đề' })
-//     }
 
-//     return errors
-// }
-
-async function onSubmit(event: any) {
+async function onSubmit() {
     if (!state.file) {
         toast.add({
             title: 'Bạn chưa tải file csv',
@@ -213,13 +159,11 @@ async function onSubmit(event: any) {
     }
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
-            console.log('response.length', response.length)
             if (response.length) {
-                // loadPdf()
                 state.answer = response
-                onMarkStudent(0)
-
-                isOpen.value = true
+                if (!isOpen.value) {
+                    isOpen.value = true
+                }
             } else {
                 throw ''
             }
@@ -238,71 +182,163 @@ async function onSubmit(event: any) {
         })
 }
 
-async function sendEmail(): Promise<void> {
-    await loadPdf()
+async function sendEmail(
+    student: any,
+    email = 'work.huypui@gmail.com'
+): Promise<void> {
     state.loading = true
-    const data: IFormData = {
-        name: state.studentActive,
-        email: state.emailtest,
-        subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
-        body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${caculatorMark()}`,
-    }
-    successMessage.value = null
 
-    const filename = `${state.studentActive['Số Báo Danh']}-${state.studentActive['Mã đề']}-ThucChien1-2-3.pdf`
+    const pdfMaker = $pdfMake as any
+    const { content, filename } = await onPdfByStudent(student)
+    const pdfDocGenerator = pdfMaker.createPdf(
+        JSON.parse(JSON.stringify(content))
+    )
+    await pdfDocGenerator.getBlob(async (pdf: string) => {
+        const data: IFormData = {
+            name: student['Họ và Tên'],
+            email: email,
+            subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
+            body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${caculatorMark(
+                student
+            )}`,
+        }
+        successMessage.value = null
 
-    const headers = new Headers({
-        fileName: filename,
+        const headers = new Headers({
+            fileName: filename,
+        })
+
+        const form = new FormData()
+        form.append('name', data.name)
+        form.append('email', data.email)
+        form.append('subject', data.subject)
+        form.append('body', data.body)
+        form.append('pdf', pdf)
+
+        const requestData: any = {
+            formData: form,
+            fileHeaders: headers,
+        }
+        const requestInit: any = {
+            method: 'POST',
+            body: requestData.formData,
+            headers: requestData.fileHeaders,
+        }
+        try {
+            await $fetch('/api/user/email-sender', requestInit)
+                .then(() => {
+                    successMessage.value = 'Email has been sent.'
+                    toast.add({
+                        title: 'Email đã được gửi đến ' + data.name,
+                        timeout: 3000,
+                        icon: 'i-heroicons-check-circle',
+                    })
+                })
+                .catch((error) => {
+                    console.log('error', error)
+                    toast.add({
+                        title: 'Gửi email lỗi đến ' + data.name,
+                        description: 'Vui lòng kiểm tra lại địa chỉ email.',
+                        timeout: 3000,
+                        icon: 'i-heroicons-exclamation-triangle',
+                        color: 'orange',
+                    })
+                })
+                .finally(() => {
+                    state.loading = false
+                })
+        } catch (error) {
+            console.log(error)
+        }
     })
-
-    const form = new FormData()
-    form.append('name', state.studentActive['Họ và Tên'])
-    form.append('email', data.email)
-    form.append('subject', data.subject)
-    form.append('body', data.body)
-    form.append('pdf', state.pdf)
-
-    const requestData: any = {
-        formData: form,
-        fileHeaders: headers,
-    }
-    const requestInit: any = {
-        method: 'POST',
-        body: requestData.formData,
-        headers: requestData.fileHeaders,
-    }
-    try {
-        $fetch('/api/user/email-sender', requestInit)
-            .then((data) => {
-                successMessage.value = 'Email has been sent.'
-                toast.add({
-                    title: 'Email đã được gửi đi.',
-                    timeout: 3000,
-                    icon: 'i-heroicons-check-circle',
-                })
-            })
-            .catch((error) => {
-                console.log('error', error)
-                toast.add({
-                    title: 'Gửi email lỗi ',
-                    description: 'Vui lòng kiểm tra lại địa chỉ email.',
-                    timeout: 3000,
-                    icon: 'i-heroicons-exclamation-triangle',
-                    color: 'orange',
-                })
-            })
-            .finally(() => {
-                state.loading = false
-            })
-    } catch (error) {
-        console.log(error)
-    }
 }
-const caculatorMark = () => {
-    return (
-        ((50 - state.studentActive.incorrerAnswer.length) / 50) *
-        10
-    ).toFixed(1)
+const caculatorMark = (student: any) => {
+    return (((50 - student.incorrerAnswer.length) / 50) * 10).toFixed(1)
+}
+const downloadAll = async () => {
+    state.loading = true
+    const zip = new JSZip()
+    const pdfMaker = $pdfMake as any
+    pdfMaker.tableLayouts = {
+        custom: {
+            fillColor: function (rowIndex: number) {
+                return rowIndex % 2 !== 0 ? '#00000' : null
+            },
+            hLineColor: '#00000',
+            vLineColor: '#00000',
+            paddingLeft: function () {
+                return 10
+            },
+            paddingRight: function () {
+                return 10
+            },
+        },
+    }
+    let index = 0
+    const interval = setInterval(async function () {
+        if (index < state.excercies.length) {
+            // docArray here is array of docs contents
+            const student = state.excercies[index]
+            const answer = state.answer.find((item: any) => {
+                return item.code == `${student['Mã đề']}`
+            })
+            const incorrerAnswer = checkAndGenerateAnswer(student, answer)
+            student.incorrerAnswer = incorrerAnswer
+            // playground requires you to assign document definition to a variable called dd
+            const resolve = incorrerAnswer.map((item: any) => ({
+                question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
+                link: item['Đường Dẫn'],
+            }))
+            const mark = caculatorMark(student)
+            const content = generateContent(student, resolve, mark)
+
+            const pdfDocGenerator = pdfMaker.createPdf(
+                JSON.parse(JSON.stringify(content))
+            )
+
+            pdfDocGenerator.getBlob(async (blob: string) => {
+                const name = `${student['Số Báo Danh']}-${student['Mã đề']}-ThucChien1-2-3.pdf`
+                state.zips.push({ name, blob })
+            })
+            index++
+        } else {
+            state.zips.forEach((item: any) => {
+                zip.file(item.name, item.blob)
+            })
+            zip.generateAsync({ type: 'blob' }).then(function (content) {
+                saveAs(content, 'thuc-chien.zip')
+            })
+            state.loading = false
+            clearInterval(interval)
+        }
+    }, 200)
+}
+const sendAllEmail = () => {
+    // state.loading = true
+    let index = 0
+    const interval = setInterval(async function () {
+        if (index < state.excercies.length) {
+            const student = state.excercies[index]
+            new Promise((resolve) => {
+                sendEmail(student)
+                resolve(1)
+            }).then(() => {
+                index++
+                state.studentEmailCount = index
+            })
+        } else {
+            // state.loading = false
+            state.studentEmailCount = 0
+            clearInterval(interval)
+        }
+    }, 1000)
+}
+const onChangeTab = (index: any) => {
+    const student = state.excercies[index]
+    const mark = caculatorMark(student)
+    const incorrerAnswer = onMarkStudent(student)
+    state.studentActive.incorrerAnswer = incorrerAnswer
+    state.studentActive.mark = mark
 }
 </script>
 
@@ -338,8 +374,8 @@ const caculatorMark = () => {
                         <div class="p-4 h-fit">
                             <UTabs
                                 :items="state.students"
-                                @change="onMarkStudent"
                                 orientation="vertical"
+                                @change="onChangeTab"
                                 :ui="{
                                     container: 'relative w-full',
                                     wrapper: 'flex items-center gap-4',
@@ -357,29 +393,60 @@ const caculatorMark = () => {
                                             v-if="state.loading"
                                             animation="carousel"
                                         />
-                                        <div class="flex justify-end gap-4">
+                                        <UMeter
+                                            v-if="
+                                                state.studentEmailCount &&
+                                                state.students.length
+                                            "
+                                            :value="
+                                                (state.studentEmailCount /
+                                                    state.students.length) *
+                                                100
+                                            "
+                                            indicator
+                                        />
+                                        <div
+                                            class="flex justify-evenly gap-4 flex-wrap"
+                                        >
                                             <UButton
                                                 class="w-fit"
-                                                @click="generateHTMLToPDF"
-                                                >Tải bản PDF lời giải</UButton
+                                                color="indigo"
+                                                @click="downloadAll"
+                                                >Tải bản toàn bộ PDF lời
+                                                giải</UButton
                                             >
-                                            <UFormGroup
-                                                name="code"
-                                                eager-validation
-                                                required
-                                            >
-                                                <UInput
-                                                    v-model="state.emailtest"
-                                                    placeholder="Nhập email đích để test"
-                                                />
-                                            </UFormGroup>
+
                                             <UButton
                                                 class="w-fit"
-                                                @click="sendEmail"
-                                                >Gửi kết lời giải qua
+                                                color="indigo"
+                                                @click="sendAllEmail"
+                                                >Gửi toàn bộ lời giải qua
+                                                Email</UButton
+                                            >
+                                            <UButton
+                                                class="w-fit"
+                                                @click="
+                                                    onPdfByStudent(
+                                                        state.studentActive,
+                                                        true
+                                                    )
+                                                "
+                                                >Tải bản từng bản PDF lời
+                                                giải</UButton
+                                            >
+
+                                            <UButton
+                                                class="w-fit"
+                                                @click="
+                                                    sendEmail(
+                                                        state.studentActive
+                                                    )
+                                                "
+                                                >Gửi kết lời giải qua từng
                                                 Email</UButton
                                             >
                                         </div>
+
                                         <div
                                             class="shadow-[0_0_1px_#7a7a7a] rounded-sm p-4 flex-1 overflow-y-scroll"
                                         >
@@ -424,7 +491,7 @@ const caculatorMark = () => {
                                                 <p>Cơ sở: NQH Q10</p>
                                                 <p>
                                                     Điểm bài thi:
-                                                    <span
+                                                    <!-- <span
                                                         v-if="
                                                             state.studentActive
                                                                 .incorrerAnswer
@@ -432,10 +499,14 @@ const caculatorMark = () => {
                                                         "
                                                     >
                                                         {{
-                                                            caculatorMark()
-                                                        }}</span
+                                                            caculatorMark(
+                                                                state.studentActive
+                                                            )
+                                                        }}
+                                                        
+                                                        </span
                                                     >
-                                                    <span v-else> 10</span>
+                                                    <span v-else> 10</span> -->
                                                 </p>
                                                 <p>
                                                     Học sinh đang học tại NQH:
@@ -463,7 +534,7 @@ const caculatorMark = () => {
                                                 Những nội dung con cần ôn tập
                                                 thêm - Đề số: 2
                                             </p>
-                                            <ol class="list-decimal p-5">
+                                            <!-- <ol class="list-decimal p-5">
                                                 <li
                                                     v-for="item in state
                                                         .studentActive
@@ -477,7 +548,7 @@ const caculatorMark = () => {
                                                         {{ item['Giải pháp'] }}
                                                     </a>
                                                 </li>
-                                            </ol>
+                                            </ol> -->
                                         </div>
                                     </div>
                                 </template></UTabs
