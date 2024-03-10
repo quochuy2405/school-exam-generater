@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose'
 
 const StudentSchema = new Schema({
-    name: String,
-    email: String,
+    students: Array<object>,
+    class: String,
 })
 
 export const Student = model('Student', StudentSchema)
