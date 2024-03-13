@@ -71,7 +71,9 @@ const csvLineToJson = (dataLineSplit: Array<string>, header: any) => {
 export const generateContent = (
     student: any,
     anwers: Array<any>,
-    mark: string
+    mark: string,
+    subject: string,
+    school: string
 ) => {
     const ol = anwers.map((item) => ({
         text: `${item.question} (Bấm để xem đáp án)`,
@@ -113,7 +115,7 @@ export const generateContent = (
                         absolutePosition: { x: 290, y: 47 },
                     },
                     {
-                        text: 'Toán',
+                        text: subject,
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -126,7 +128,7 @@ export const generateContent = (
                 columns: [
                     {
                         width: '*',
-                        text: 'THPT Chu Văn An ',
+                        text: school,
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,

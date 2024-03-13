@@ -43,10 +43,11 @@ const columns = [
     },
 ]
 const toast = useToast()
+const router = useRoute()
 const state = reactive({
     code: undefined,
     class: undefined,
-    types: undefined,
+    type: undefined,
     file: undefined,
     excercies: [] as any,
 })
@@ -96,9 +97,21 @@ async function onSubmit(event: any) {
 
         return
     }
+    if (!router.params.slug) {
+        toast.add({
+            title: 'Lỗi đường dẫn',
+            timeout: 3000,
+            icon: 'i-heroicons-exclamation-triangle',
+            color: 'orange',
+        })
+
+        return
+    }
 
     const dataCreate = {
         code: event.data.code,
+        type: event.data.type,
+        subject: router.params.slug,
         excercies: { ...event.data.excercies },
     }
     $fetch('/api/exam/add', {
@@ -133,10 +146,17 @@ async function onSubmit(event: any) {
 </script>
 
 <template>
-    <div
-        class="flex h-full flex-col gap-3 w-full px-2 py-1 overflow-hidden"
-    >
+    <div class="flex h-full flex-col gap-3 w-full px-2 py-1 overflow-hidden">
         <UCard>
+            <div class="flex justify-start mb-2">
+                <UButton
+                    :to="`/quanlydapan/${router.params?.slug}`"
+                    type="submit"
+                    color="black"
+                    class="h-fit w-fit px-2"
+                    >Quay về</UButton
+                >
+            </div>
             <UForm
                 :schema="schema"
                 :state="state"
@@ -161,6 +181,17 @@ async function onSubmit(event: any) {
                             <UInput
                                 v-model="state.code"
                                 placeholder="Nhập mã đề"
+                            />
+                        </UFormGroup>
+                        <UFormGroup
+                            label="Số thực chiến"
+                            name="type"
+                            eager-validation
+                        >
+                            <USelect
+                                v-model="state.type"
+                                placeholder="Chọn số thực chiến"
+                                :options="['Thực chiến 1', 'Thực chiến 2']"
                             />
                         </UFormGroup>
                     </div>

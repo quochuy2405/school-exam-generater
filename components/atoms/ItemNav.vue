@@ -67,9 +67,9 @@ const route = useRoute()
             />
         </svg>
         <svg
-            v-if="href == '/quanlyde'"
             width="20"
             height="20"
+            v-if="href == '/quanlyde/toan'"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -82,16 +82,131 @@ const route = useRoute()
             ></g>
             <g id="SVGRepo_iconCarrier">
                 <path
-                    d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                    stroke="#323232"
-                    stroke-width="2"
+                    d="M14.4199 5.63965H21.6999"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                 ></path>
                 <path
-                    d="M9 12L10.6828 13.6828V13.6828C10.858 13.858 11.142 13.858 11.3172 13.6828V13.6828L15 10"
+                    opacity="0.4"
+                    d="M2.29883 5.64014H9.57883"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    opacity="0.4"
+                    d="M14.4199 15.3301H21.6999"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    opacity="0.4"
+                    d="M14.4199 21.3896H21.6999"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    d="M18.0898 9.27V2"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    d="M2.29883 22L9.57883 14.73"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+                <path
+                    d="M9.57883 22L2.29883 14.73"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                ></path>
+            </g>
+        </svg>
+        <svg
+            width="20"
+            height="20"
+            v-if="href == '/quanlyde/ly'"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+                <path
+                    d="M5 12H7.75044C7.89947 12 8.03179 11.9046 8.07892 11.7632V11.7632L9.875 6.375V6.375C9.91626 6.25122 10.0918 6.25238 10.1364 6.375V6.375L13.875 16.6562L13.885 16.6837C13.9253 16.7946 14.0812 16.797 14.125 16.6875V16.6875L15.8841 12.2898V12.2898C15.9541 12.1148 16.1236 12 16.3122 12H19"
                     stroke="#323232"
                     stroke-width="2"
                     stroke-linecap="round"
                     stroke-linejoin="round"
+                ></path>
+            </g>
+        </svg>
+        <svg
+            width="20"
+            height="20"
+            v-if="href == '/quanlyde/hoa'"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+                <path
+                    d="M10 17C10.5523 17 11 16.5523 11 16C11 15.4477 10.5523 15 10 15C9.44772 15 9 15.4477 9 16C9 16.5523 9.44772 17 10 17Z"
+                    fill="#0F0F0F"
+                ></path>
+                <path
+                    d="M15 18C15 18.5523 14.5523 19 14 19C13.4477 19 13 18.5523 13 18C13 17.4477 13.4477 17 14 17C14.5523 17 15 17.4477 15 18Z"
+                    fill="#0F0F0F"
+                ></path>
+                <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M15 3V7.58152C17.9318 8.76829 20 11.6426 20 15C20 19.4183 16.4183 23 12 23C7.58172 23 4 19.4183 4 15C4 11.6426 6.06817 8.76829 9 7.58152V3H8C7.44772 3 7 2.55228 7 2C7 1.44772 7.44772 1 8 1H16C16.5523 1 17 1.44772 17 2C17 2.55228 16.5523 3 16 3H15ZM9.75043 9.43539L10.3752 9.18249C10.7529 9.02962 11 8.66295 11 8.25555V3H13V8.25555C13 8.66295 13.2471 9.02962 13.6248 9.18249L14.2496 9.43539C15.1075 9.78268 15.8661 10.3221 16.4726 11L7.52739 11C8.13388 10.3221 8.89249 9.78268 9.75043 9.43539ZM6.3414 13C6.12025 13.6258 6 14.2991 6 15C6 18.3137 8.68629 21 12 21C15.3137 21 18 18.3137 18 15C18 14.2991 17.8798 13.6258 17.6586 13L6.3414 13Z"
+                    fill="#0F0F0F"
+                ></path>
+            </g>
+        </svg>
+        <svg
+            width="20"
+            height="20"
+            v-if="href == '/quanlyde/danhgia'"
+            fill="#000000"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g
+                id="SVGRepo_tracerCarrier"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+                <path
+                    d="M12.6128994,2.20970461 L12.7071068,2.29289322 L15.415,5 L18,5 C18.5128358,5 18.9355072,5.38604019 18.9932723,5.88337887 L19,6 L19,8.585 L21.7071068,11.2928932 C22.0675907,11.6533772 22.0953203,12.2206082 21.7902954,12.6128994 L21.7071068,12.7071068 L19,15.414 L19,18 C19,18.5128358 18.6139598,18.9355072 18.1166211,18.9932723 L18,19 L15.414,19 L12.7071068,21.7071068 C12.3466228,22.0675907 11.7793918,22.0953203 11.3871006,21.7902954 L11.2928932,21.7071068 L8.585,19 L6,19 C5.48716416,19 5.06449284,18.6139598 5.00672773,18.1166211 L5,18 L5,15.415 L2.29289322,12.7071068 C1.93240926,12.3466228 1.90467972,11.7793918 2.20970461,11.3871006 L2.29289322,11.2928932 L5,8.584 L5,6 C5,5.48716416 5.38604019,5.06449284 5.88337887,5.00672773 L6,5 L8.584,5 L11.2928932,2.29289322 C11.6533772,1.93240926 12.2206082,1.90467972 12.6128994,2.20970461 Z"
                 ></path>
             </g>
         </svg>

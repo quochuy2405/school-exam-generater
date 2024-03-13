@@ -74,9 +74,12 @@ const items = (row: any) => [
     ],
 ]
 const toast = useToast()
+const router = useRoute()
+console.log('params', router)
 const state = reactive({
     code: undefined,
     loading: false,
+    type: undefined,
     excercies: [] as any,
 })
 const formEdit = reactive({
@@ -115,6 +118,8 @@ async function onSubmit(event: any) {
     state.loading = true
     const body = {
         code: event.data.code,
+        type: event.data.type,
+        subject: router.params.slug,
     }
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
@@ -173,7 +178,7 @@ async function onUpdate(event: any) {
                 :validate="validate"
                 @submit="onSubmit"
                 ><div class="grid grid-cols-2 lg:w-3/5 gap-3">
-                    <div class="flex flex-col gap-2">
+                    <div class="flex gap-2">
                         <UFormGroup
                             label="Mã đề"
                             name="code"
@@ -185,10 +190,30 @@ async function onUpdate(event: any) {
                                 placeholder="Nhập mã đề"
                             />
                         </UFormGroup>
+                        <UFormGroup
+                            label="Số thực chiến"
+                            name="type"
+                            eager-validation
+                        >
+                            <USelect
+                                v-model="state.type"
+                                placeholder="Chọn số thực chiến"
+                                :options="['Thực chiến 1', 'Thực chiến 2']"
+                            />
+                        </UFormGroup>
                     </div>
                 </div>
 
-                <div class="flex justify-end">
+                <div class="flex justify-end gap-4">
+                    <UButton
+                        :to="`/quanlydapan/${router.params?.slug}/nhaplieu`"
+                        type="button"
+                        color="black"
+                        variant="solid"
+                        class="h-fit w-fit px-2"
+                        :loading="state.loading"
+                        >Tạo bộ câu hỏi mới</UButton
+                    >
                     <UButton
                         type="submit"
                         class="h-fit w-fit px-2"
