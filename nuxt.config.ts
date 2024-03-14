@@ -10,19 +10,17 @@ export default defineNuxtConfig({
         public: {
             google: {
                 GOOGLE_MAILER_CLIENT_ID:
-                    '434231631925-a6e8h6s0e5d9l6kj12rp2iq76ca6knr4.apps.googleusercontent.com',
-                GOOGLE_MAILER_CLIENT_SECRET:
-                    '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',
+                    '888501734074-slel7thgrmaqntmtv75m0mthlrirgsiq.apps.googleusercontent.com',
+                GOOGLE_MAILER_CLIENT_SECRET: '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',
                 GOOGLE_MAILER_REFRESH_TOKEN:
-                    '1//04-HL2-d6pPS9CgYIARAAGAQSNwF-L9IrZTMFWK5KVaMIZ2ROVR79izPtnYISPOoiwHmHVeuPlSYnOHNH5ED9x0L48glEonM2KIE',
+                    '1//04SqcAcuLt0soCgYIARAAGAQSNwF-L9IrJBo9A8-xl-hmHq84_4-_1BcCgQSJK79KCYK0r6yobtIEa9i_HQrmLa-NlXrZDTaT0fg',
             },
             email: {
-                EMAIL_USER: 'work.huypui@gmail.com',
-                EMAIL_PASS: '240501@@@@',
+                EMAIL_USER: 'hethonggiaoducnqh@gmail.com',
+                EMAIL_PASS: 'Khatvonglamtoicung',
             },
             mongodbUri:
                 'mongodb+srv://workhuypui:workhuypui@nqhschool.5r2gsq5.mongodb.net/nqhschool',
         },
     },
-
 })

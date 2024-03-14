@@ -41,7 +41,7 @@ const sendMail = async (data: IEmailData, event: any): Promise<void> => {
         } as any)
         const compileSource = handlebars.compile(data.source)
         const mailOptions = {
-            from: 'Trung tâm NQH <work.huypui@gmail.com>',
+            from: 'Trung tâm NQH <hethonggiaoducnqh@gmail.com>',
             to: data.head.to,
             subject: data.head.subject,
             html: compileSource(data.body),
