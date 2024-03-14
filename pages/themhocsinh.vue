@@ -135,7 +135,7 @@ async function onSubmit(event: any) {
 
 <template>
     <div class="flex h-full flex-col gap-3 w-full overflow-auto px-2 py-1">
-        <UCard>
+        <!-- <UCard>
             <UForm
                 :schema="schema"
                 :state="state"
@@ -184,7 +184,7 @@ async function onSubmit(event: any) {
                 </div>
             </UForm>
         </UCard>
-        <h1 class="font-medium">Hoặc</h1>
+        <h1 class="font-medium">Hoặc</h1> -->
 
         <UForm
             :state="state"

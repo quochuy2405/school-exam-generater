@@ -99,7 +99,7 @@ export const generateContent = (
                 columns: [
                     {
                         width: '*',
-                        text: student['Họ và Tên'],
+                        text: student['Họ và Tên'] || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -107,7 +107,7 @@ export const generateContent = (
                         absolutePosition: { x: 72, y: 47 },
                     },
                     {
-                        text: student['Số Báo Danh'],
+                        text: student?.['Số Báo Danh'] || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -128,7 +128,7 @@ export const generateContent = (
                 columns: [
                     {
                         width: '*',
-                        text: school,
+                        text: school || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -154,12 +154,12 @@ export const generateContent = (
                 ],
             },
             {
-                text: student['Mã đề'],
+                text: student['Mã đề'] || '',
 
                 bold: true,
                 alignment: 'center',
                 fontSize: 15,
-                color: '0070bb',
+                color: '#0070bb',
                 absolutePosition: { x: 353, y: 110 },
             },
             {

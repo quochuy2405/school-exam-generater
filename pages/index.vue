@@ -28,6 +28,10 @@ const state = reactive({
     zips: [] as any,
     studentsInfo: {} as any,
     studentEmailCount: 0,
+    emailList: {
+        success: [] as Array<string>,
+        fail: [] as Array<string>,
+    },
 })
 const filter = reactive({
     subject: 'Toán',
@@ -76,6 +80,7 @@ const handleChangeFile = (event: any) => {
         state.columns = [...studentColumns, ...colsAdding]
         state.excercies = [...jsonData]
         state.studentActive = state.excercies[0]
+        state.studentActive.index = 0
 
         state.students = state.excercies.map((item: any) => {
             return {
@@ -85,7 +90,6 @@ const handleChangeFile = (event: any) => {
                 slot: 'pdf',
             }
         })
-        console.log('state.students', state.students)
         const codes = state.excercies.map((item: any) => item['Số Báo Danh'])
 
         $fetch('/api/student/find', {
@@ -171,7 +175,6 @@ const onMarkStudent = (student: any) => {
     }
 
     const incorrerAnswer = checkAndGenerateAnswer(student, answer)
-    console.log('answer', Object.keys(answer?.excercies).length)
 
     const mark = (
         ((Object.keys(answer?.excercies)?.length - incorrerAnswer?.length) /
@@ -221,7 +224,6 @@ async function onSubmit() {
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
             if (response.length) {
-                console.log('response', response)
                 state.answer = response
                 if (!isOpen.value) {
                     isOpen.value = true
@@ -244,70 +246,91 @@ async function onSubmit() {
         })
 }
 
-async function sendEmail(student: any, email = 'work.huypui@gmail.com'): Promise<void> {
+async function sendEmail(student: any, email: string): Promise<void> {
     state.loading = true
 
-    const pdfMaker = $pdfMake as any
-    const { content, filename } = await onPdfByStudent(student)
-    const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
-    await pdfDocGenerator.getBlob(async (pdf: string) => {
-        const data: IFormData = {
-            name: student['Họ và Tên'],
-            email: email,
-            subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
-            body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${
-                onMarkStudent(student).mark
-            }`,
-        }
-        successMessage.value = null
+    try {
+        const pdfMaker = $pdfMake as any
+        const { content, filename } = await onPdfByStudent(student)
+        const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
+        await pdfDocGenerator.getBlob(async (pdf: string) => {
+            const data: IFormData = {
+                name: student['Họ và Tên'],
+                email: email,
+                subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
+                body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${
+                    onMarkStudent(student).mark
+                }`,
+            }
+            successMessage.value = null
 
-        const headers = new Headers({
-            fileName: filename,
+            const headers = new Headers({
+                fileName: filename,
+            })
+
+            const form = new FormData()
+            form.append('name', data.name)
+            form.append('email', data.email)
+            form.append('subject', data.subject)
+            form.append('body', data.body)
+            form.append('pdf', pdf)
+
+            const requestData: any = {
+                formData: form,
+                fileHeaders: headers,
+            }
+            const requestInit: any = {
+                method: 'POST',
+                body: requestData.formData,
+                headers: requestData.fileHeaders,
+            }
+            try {
+                await $fetch('/api/user/email-sender', requestInit)
+                    .then(() => {
+                        state.emailList.success.push(student['Số Báo Danh'])
+                        successMessage.value = 'Email has been sent.'
+                        toast.add({
+                            title: 'Email đã được gửi đến ' + data.name,
+                            timeout: 3000,
+                            icon: 'i-heroicons-check-circle',
+                        })
+                    })
+                    .catch((error) => {
+                        state.loading = false
+                        console.log('error', error)
+                        toast.add({
+                            title: 'Gửi email lỗi đến ' + data.name,
+                            description: 'Vui lòng kiểm tra lại địa chỉ email.',
+                            timeout: 3000,
+                            icon: 'i-heroicons-exclamation-triangle',
+                            color: 'orange',
+                        })
+                    })
+                    .finally(() => {
+                        state.loading = false
+                    })
+            } catch (error) {
+                state.loading = false
+                console.log(error)
+                toast.add({
+                    title: 'Gửi email lỗi đến ' + data.name,
+                    description: 'Vui lòng kiểm tra lại địa chỉ email.',
+                    timeout: 3000,
+                    icon: 'i-heroicons-exclamation-triangle',
+                    color: 'orange',
+                })
+            }
         })
-
-        const form = new FormData()
-        form.append('name', data.name)
-        form.append('email', data.email)
-        form.append('subject', data.subject)
-        form.append('body', data.body)
-        form.append('pdf', pdf)
-
-        const requestData: any = {
-            formData: form,
-            fileHeaders: headers,
-        }
-        const requestInit: any = {
-            method: 'POST',
-            body: requestData.formData,
-            headers: requestData.fileHeaders,
-        }
-        try {
-            await $fetch('/api/user/email-sender', requestInit)
-                .then(() => {
-                    successMessage.value = 'Email has been sent.'
-                    toast.add({
-                        title: 'Email đã được gửi đến ' + data.name,
-                        timeout: 3000,
-                        icon: 'i-heroicons-check-circle',
-                    })
-                })
-                .catch((error) => {
-                    console.log('error', error)
-                    toast.add({
-                        title: 'Gửi email lỗi đến ' + data.name,
-                        description: 'Vui lòng kiểm tra lại địa chỉ email.',
-                        timeout: 3000,
-                        icon: 'i-heroicons-exclamation-triangle',
-                        color: 'orange',
-                    })
-                })
-                .finally(() => {
-                    state.loading = false
-                })
-        } catch (error) {
-            console.log(error)
-        }
-    })
+    } catch (error) {
+        state.loading = false
+        toast.add({
+            title: 'Gửi email lỗi đến ',
+            description: 'Vui lòng kiểm tra lại địa chỉ email.',
+            timeout: 3000,
+            icon: 'i-heroicons-exclamation-triangle',
+            color: 'orange',
+        })
+    }
 }
 
 const downloadAll = async () => {
@@ -332,7 +355,6 @@ const downloadAll = async () => {
     let index = 0
     const interval = setInterval(async function () {
         if (index < state.excercies.length) {
-            console.log('state.excercies', state.excercies)
             // docArray here is array of docs contents
             const student = state.excercies[index]
             const answer = state.answer.find((item: any) => {
@@ -404,6 +426,7 @@ const onChangeTab = (index: any) => {
     state.studentActive = student
     state.studentActive.incorrerAnswer = incorrerAnswer
     state.studentActive.mark = mark
+    state.studentActive.index = index
 }
 </script>
 
@@ -442,6 +465,17 @@ const onChangeTab = (index: any) => {
                                     v-for="(item, index) in state.students"
                                     :key="index"
                                     orientation="vertical"
+                                    :class="[
+                                        !!state.emailList.success.length &&
+                                            !state.emailList.success.includes(
+                                                item.value['Số Báo Danh']
+                                            ) &&
+                                            'bg-red-500',
+                                        state.studentActive['Số Báo Danh'] ===
+                                            `${item.value['Số Báo Danh']}` &&
+                                            'bg-black hover:bg-black',
+                                        ,
+                                    ]"
                                     @click="() => onChangeTab(index)"
                                     >{{ item.label }}</UButton
                                 >
@@ -463,7 +497,19 @@ const onChangeTab = (index: any) => {
                                         >Tải bản từng bản PDF lời giải</UButton
                                     >
 
-                                    <UButton class="w-fit" @click="sendEmail(state.studentActive)"
+                                    <UButton
+                                        class="w-fit"
+                                        @click="
+                                            () => {
+                                                const student =
+                                                    state.excercies[state.studentActive.index]
+                                                const email =
+                                                    state.studentsInfo[
+                                                        Number(student['Số Báo Danh'])
+                                                    ]?.['EMAIL']
+                                                sendEmail(student, email)
+                                            }
+                                        "
                                         >Gửi kết lời giải qua từng Email</UButton
                                     >
                                 </div>
@@ -530,10 +576,9 @@ const onChangeTab = (index: any) => {
                                             <li v-for="item in state.studentActive.incorrerAnswer">
                                                 <a
                                                     href="https://www.google.co.uk/"
-                                                    class="underline text-[#0071bc]"
+                                                    class="underline font-medium text-[#0071bc]"
                                                 >
-                                                    {{ item['Câu Hỏi'] }} -
-                                                    {{ item['Giải pháp'] }}
+                                                    {{ item['Câu Hỏi'] }} - {{ item['Giải pháp'] }}
                                                 </a>
                                             </li>
                                         </ol>

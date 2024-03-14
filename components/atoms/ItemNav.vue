@@ -11,7 +11,7 @@ const route = useRoute()
     <NuxtLink
         :href="href"
         class="flex font-medium text-sm items-center gap-2 cursor-pointer p-4 py-2 rounded-lg"
-        :class="{ 'bg-[#dadada77]': route.matched[0]['path'] == href }"
+        :class="{ 'bg-[#dadada77]': route.href == href }"
     >
         <svg
             version="1.1"
@@ -69,17 +69,13 @@ const route = useRoute()
         <svg
             width="20"
             height="20"
-            v-if="href == '/quanlyde/toan'"
+            v-if="href == '/quanlydapan/toan'"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-                id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            ></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
                 <path
                     d="M14.4199 5.63965H21.6999"
@@ -138,17 +134,13 @@ const route = useRoute()
         <svg
             width="20"
             height="20"
-            v-if="href == '/quanlyde/ly'"
+            v-if="href == '/quanlydapan/ly'"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-                id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            ></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
                 <path
                     d="M5 12H7.75044C7.89947 12 8.03179 11.9046 8.07892 11.7632V11.7632L9.875 6.375V6.375C9.91626 6.25122 10.0918 6.25238 10.1364 6.375V6.375L13.875 16.6562L13.885 16.6837C13.9253 16.7946 14.0812 16.797 14.125 16.6875V16.6875L15.8841 12.2898V12.2898C15.9541 12.1148 16.1236 12 16.3122 12H19"
@@ -162,17 +154,13 @@ const route = useRoute()
         <svg
             width="20"
             height="20"
-            v-if="href == '/quanlyde/hoa'"
+            v-if="href == '/quanlydapan/hoa'"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-                id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            ></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
                 <path
                     d="M10 17C10.5523 17 11 16.5523 11 16C11 15.4477 10.5523 15 10 15C9.44772 15 9 15.4477 9 16C9 16.5523 9.44772 17 10 17Z"
@@ -193,23 +181,20 @@ const route = useRoute()
         <svg
             width="20"
             height="20"
-            v-if="href == '/quanlyde/danhgia'"
+            v-if="href == '/quanlydapan/danhgia'"
             fill="#000000"
             viewBox="0 0 24 24"
             xmlns="http://www.w3.org/2000/svg"
         >
             <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-            <g
-                id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            ></g>
+            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
             <g id="SVGRepo_iconCarrier">
                 <path
                     d="M12.6128994,2.20970461 L12.7071068,2.29289322 L15.415,5 L18,5 C18.5128358,5 18.9355072,5.38604019 18.9932723,5.88337887 L19,6 L19,8.585 L21.7071068,11.2928932 C22.0675907,11.6533772 22.0953203,12.2206082 21.7902954,12.6128994 L21.7071068,12.7071068 L19,15.414 L19,18 C19,18.5128358 18.6139598,18.9355072 18.1166211,18.9932723 L18,19 L15.414,19 L12.7071068,21.7071068 C12.3466228,22.0675907 11.7793918,22.0953203 11.3871006,21.7902954 L11.2928932,21.7071068 L8.585,19 L6,19 C5.48716416,19 5.06449284,18.6139598 5.00672773,18.1166211 L5,18 L5,15.415 L2.29289322,12.7071068 C1.93240926,12.3466228 1.90467972,11.7793918 2.20970461,11.3871006 L2.29289322,11.2928932 L5,8.584 L5,6 C5,5.48716416 5.38604019,5.06449284 5.88337887,5.00672773 L6,5 L8.584,5 L11.2928932,2.29289322 C11.6533772,1.93240926 12.2206082,1.90467972 12.6128994,2.20970461 Z"
                 ></path>
             </g>
         </svg>
+
         {{ name }}
     </NuxtLink>
 </template>
