@@ -139,11 +139,12 @@ const onPdfByStudent = async (student: any, download = false) => {
         answer,
         mark,
         filter.subject,
-        state.studentsInfo[Number(student['Số Báo Danh'])]?.['SCHOOL']
+        state?.studentsInfo?.[Number(student['Số Báo Danh'])]?.['SCHOOL'],
+        !!state?.studentsInfo?.[Number(student?.['Số Báo Danh'])]?.['NQH']
     )
     const filename = `${student['Số Báo Danh']}-${student['Mã đề']}-ThucChien1-2-3.pdf`
     if (download) {
-        pdfMaker.createPdf(content).getBlob((blob: any) => {
+        pdfMaker.createPdf(JSON.parse(JSON.stringify(content))).getBlob((blob: any) => {
             const url = URL.createObjectURL(blob)
 
             // Tạo một đường link để tải tệp PDF
@@ -375,7 +376,8 @@ const downloadAll = async () => {
                 resolve,
                 mark,
                 filter.subject,
-                state.studentsInfo[Number(student['Số Báo Danh'])]?.['SCHOOL']
+                state?.studentsInfo?.[Number(student['Số Báo Danh'])]?.['SCHOOL'],
+                !!state?.studentsInfo?.[Number(student?.['Số Báo Danh'])]?.['NQH']
             )
 
             const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
@@ -598,6 +600,11 @@ const addToHistory = async (student: any) => {
                                     </p>
                                     <p
                                         class="text-[#0071bc] font-bold absolute left-[788px] top-[96px] opacity-95"
+                                        :class="[
+                                            !state.studentsInfo[
+                                                Number(state.studentActive['Số Báo Danh'])
+                                            ]?.['NQH'] && 'left-[820px]',
+                                        ]"
                                     >
                                         X
                                     </p>

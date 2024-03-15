@@ -73,9 +73,10 @@ export const generateContent = (
     anwers: Array<any>,
     mark: string,
     subject: string,
-    school: string
+    school: string,
+    isNQH: boolean
 ) => {
-    const ol = anwers.map((item) => ({
+    const ol = anwers?.map((item) => ({
         text: `${item.question} (Bấm để xem đáp án)`,
         link: item.link,
         decoration: 'underline',
@@ -115,7 +116,7 @@ export const generateContent = (
                         absolutePosition: { x: 290, y: 47 },
                     },
                     {
-                        text: subject,
+                        text: subject || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -136,7 +137,7 @@ export const generateContent = (
                         absolutePosition: { x: 65, y: 69 },
                     },
                     {
-                        text: mark,
+                        text: mark || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -149,7 +150,8 @@ export const generateContent = (
                         alignment: 'left',
                         fontSize: 12,
                         color: '#0070bb',
-                        absolutePosition: { x: 543, y: 71 },
+                        absolutePosition: { x: isNQH ? 543 : 566, y: 71 },
+                        //
                     },
                 ],
             },
