@@ -227,6 +227,7 @@ async function onSubmit() {
                 state.answer = response
                 if (!isOpen.value) {
                     isOpen.value = true
+                    addToHistory(state.students)
                 }
             } else {
                 throw ''
@@ -427,6 +428,43 @@ const onChangeTab = (index: any) => {
     state.studentActive.incorrerAnswer = incorrerAnswer
     state.studentActive.mark = mark
     state.studentActive.index = index
+}
+const addToHistory = async (student: any) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const dataHistory = student.map((st: any) => {
+        const student = st.value
+        const { mark: SCORE } = onMarkStudent(student)
+        const MADE = st.value['Mã đề']
+        const NAME = st.value['Họ và Tên']
+        const SBD = st.value['Số Báo Danh']
+        const NGAY = today
+        const MON = filter.subject
+        const DOT = filter.type
+        return {
+            SCORE,
+            MADE,
+            NAME,
+            SBD,
+            NGAY,
+            MON,
+            DOT,
+        }
+    })
+    await $fetch('/api/history/add', {
+        method: 'POST',
+        body: dataHistory,
+    })
+        .then(() => {})
+        .catch(() => {
+            toast.add({
+                title: 'Thêm lịch sử lỗi.',
+                description: 'Vui lòng kiểm tra lại.',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+                color: 'orange',
+            })
+        })
 }
 </script>
 

@@ -36,6 +36,11 @@ const columns = [
         sortable: true,
         class: 'w-[120px]',
     },
+    {
+        key: 'actions',
+        label: 'Lịch sử điểm',
+        class: 'w-[120px]',
+    },
 ]
 
 const state = reactive({
@@ -51,10 +56,7 @@ const pageCount = 20
 const toast = useToast()
 
 const rows = computed(() => {
-    const data = state.excercies?.slice(
-        (page.value - 1) * pageCount,
-        page.value * pageCount
-    )
+    const data = state.excercies?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
 const getAll = () => {
@@ -81,7 +83,6 @@ onMounted(() => {
     getAll()
 })
 const searchStudent = (event: any) => {
-
     state.loading = true
     $fetch('/api/student/search', {
         method: 'POST',
@@ -119,11 +120,7 @@ const searchStudent = (event: any) => {
                     @change="searchStudent"
                 />
 
-                <USelect
-                    :options="['Toán', 'Lý', 'Hóa']"
-                    placeholder="Lớp"
-                    class="w-40"
-                />
+                <USelect :options="['Toán', 'Lý', 'Hóa']" placeholder="Lớp" class="w-40" />
             </div>
             <!-- <div class="overflow-auto h-full w-full flex-1"> -->
             <UTable
@@ -140,12 +137,21 @@ const searchStudent = (event: any) => {
                 }"
                 :columns="columns"
                 :rows="rows"
-            />
+            >
+                <template #NQH-data="{ row }">
+                    <UCheckbox :model-value="!!row['NQH']" disabled></UCheckbox>
+                </template>
+                <template #actions-data="{ row }">
+                    <UButton
+                        :to="`/lichsuthi/${row['SBD']}`"
+                        color="primary"
+                        label="Xem lịch sử điểm"
+                    />
+                </template>
+            </UTable>
             <!-- </div> -->
 
-            <div
-                class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
-            >
+            <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
                 <UPagination
                     v-model="page"
                     :page-count="pageCount"

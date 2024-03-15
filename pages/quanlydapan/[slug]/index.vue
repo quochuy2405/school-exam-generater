@@ -75,7 +75,7 @@ const items = (row: any) => [
 ]
 const toast = useToast()
 const router = useRoute()
-console.log('params', router)
+
 const state = reactive({
     code: undefined,
     loading: false,
