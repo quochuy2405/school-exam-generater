@@ -10,7 +10,11 @@ export default defineEventHandler(async (event) => {
         type: payload.type,
     }
     try {
-        const existed = await Exam.findOne({ code: newExam.code })
+        const existed = await Exam.findOne({
+            code: newExam.code,
+            subject: payload.subject,
+            type: payload.type,
+        })
         if (existed?.code) {
             return setResponseStatus(event, 409, 'Record is Existed')
         }

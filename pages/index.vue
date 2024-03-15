@@ -227,7 +227,8 @@ async function onSubmit() {
             if (response.length) {
                 state.answer = response
                 if (!isOpen.value) {
-                    isOpen.value = true
+                  isOpen.value = true
+                    onChangeTab(0)
                     addToHistory(state.students)
                 }
             } else {
@@ -586,24 +587,24 @@ const addToHistory = async (student: any) => {
                                     >
 
                                     <span
-                                        class="text-[#0071bc] font-bold absolute left-[725px] top-[60px] opacity-95"
+                                        class="text-[#0071bc] font-bold absolute left-[645px] top-[60px] opacity-95"
                                     >
-                                        2
+                                        NQH Quận 10
                                     </span>
                                     <p
-                                        class="text-[#0071bc] font-bold absolute left-[505px] top-[94px] opacity-95"
+                                        class="text-[#0071bc] font-bold absolute left-[365px] top-[94px] opacity-95"
                                     >
-                                        <span v-if="state?.studentActive?.incorrerAnswer?.length">
-                                            {{ onMarkStudent(state.studentActive).mark }}
+                                        <span >
+                                            {{ filter.subject }}
                                         </span>
-                                        <span v-else> 10</span>
+                                      
                                     </p>
                                     <p
-                                        class="text-[#0071bc] font-bold absolute left-[788px] top-[96px] opacity-95"
+                                        class="text-[#0071bc] font-bold absolute left-[725px] top-[96px] opacity-95"
                                         :class="[
                                             !state.studentsInfo[
                                                 Number(state.studentActive['Số Báo Danh'])
-                                            ]?.['NQH'] && 'left-[820px]',
+                                            ]?.['NQH'] && 'left-[825px]',
                                         ]"
                                     >
                                         X
@@ -620,7 +621,7 @@ const addToHistory = async (student: any) => {
                                         <ol class="list-decimal p-5">
                                             <li v-for="item in state.studentActive.incorrerAnswer">
                                                 <a
-                                                    href="https://www.google.co.uk/"
+                                                    :href="item['Đường Dẫn'] "
                                                     class="underline font-medium text-[#0071bc]"
                                                 >
                                                     {{ item['Câu Hỏi'] }} - {{ item['Giải pháp'] }}

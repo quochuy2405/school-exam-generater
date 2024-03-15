@@ -86,12 +86,12 @@ export const generateContent = (
     }))
     const content = {
         watermark: {
-            text: 'Tên trung tâm',
+            text: 'Hệ Thống Giáo Dục NQH',
             color: 'black',
             opacity: 0.05,
             bold: '900',
             italics: false,
-            fontSize: 70,
+            fontSize: 60,
         },
         background,
         content: [
@@ -105,7 +105,7 @@ export const generateContent = (
                         alignment: 'left',
                         fontSize: 12,
                         color: '#0070bb',
-                        absolutePosition: { x: 72, y: 47 },
+                        absolutePosition: { x: 80, y: 47 },
                     },
                     {
                         text: student?.['Số Báo Danh'] || '',
@@ -116,12 +116,12 @@ export const generateContent = (
                         absolutePosition: { x: 290, y: 47 },
                     },
                     {
-                        text: subject || '',
+                        text: 'NQH Quận 10',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
                         color: '#0070bb',
-                        absolutePosition: { x: 500, y: 45 },
+                        absolutePosition: { x: 450, y: 45 },
                     },
                 ],
             },
@@ -137,12 +137,12 @@ export const generateContent = (
                         absolutePosition: { x: 65, y: 69 },
                     },
                     {
-                        text: mark || '',
+                        text: subject || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
                         color: '#0070bb',
-                        absolutePosition: { x: 350, y: 69 },
+                        absolutePosition: { x: 260, y: 70 },
                     },
                     {
                         text: 'X',
@@ -150,7 +150,7 @@ export const generateContent = (
                         alignment: 'left',
                         fontSize: 12,
                         color: '#0070bb',
-                        absolutePosition: { x: isNQH ? 543 : 566, y: 71 },
+                        absolutePosition: { x: isNQH ? 503 : 572, y: 71 },
                         //
                     },
                 ],
@@ -162,7 +162,7 @@ export const generateContent = (
                 alignment: 'center',
                 fontSize: 15,
                 color: '#0070bb',
-                absolutePosition: { x: 353, y: 110 },
+                absolutePosition: { x: 353, y: 108 },
             },
             {
                 ol,
