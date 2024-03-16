@@ -257,13 +257,12 @@ async function sendEmail(student: any, email: string): Promise<void> {
         const { content, filename } = await onPdfByStudent(student)
         const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
         await pdfDocGenerator.getBlob(async (pdf: string) => {
-            const data: IFormData = {
+            const data: any = {
                 name: student['Họ và Tên'],
                 email: email,
-                subject: 'Trung tâm NQH Q10 - Sửa kết quả làm bài',
-                body: `Chào các học viên của NQH Q10. Trung tâm xin gửi nội dung cho các bạn để rèn luyện thêm. File đáp án và lời giải chi tiết được đính kèm trực tiếp bên dưới. \n Số điểm: ${
-                    onMarkStudent(student).mark
-                }`,
+                subject: filter.subject,
+                diem: onMarkStudent(student).mark,
+                sbd: student['Số Báo Danh'],
             }
             successMessage.value = null
 
@@ -275,7 +274,8 @@ async function sendEmail(student: any, email: string): Promise<void> {
             form.append('name', data.name)
             form.append('email', data.email)
             form.append('subject', data.subject)
-            form.append('body', data.body)
+            form.append('sbd', data.sbd)
+            form.append('diem', data.diem)
             form.append('pdf', pdf)
 
             const requestData: any = {
@@ -286,7 +286,8 @@ async function sendEmail(student: any, email: string): Promise<void> {
                 method: 'POST',
                 body: requestData.formData,
                 headers: requestData.fileHeaders,
-            }
+          }
+            console.log('requestInit', data)
             try {
                 await $fetch('/api/user/email-sender', requestInit)
                     .then(() => {
@@ -541,14 +542,14 @@ const addToHistory = async (student: any) => {
                                     <UButton
                                         class="w-fit"
                                         @click="
-                                            () => {
+                                           async () => {
                                                 const student =
                                                     state.excercies[state.studentActive.index]
                                                 const email =
                                                     state.studentsInfo[
                                                         Number(student['Số Báo Danh'])
                                                     ]?.['EMAIL']
-                                                sendEmail(student, email)
+                                             await   sendEmail(student, email)
                                             }
                                         "
                                         >Gửi kết lời giải qua từng Email</UButton

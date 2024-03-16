@@ -85,14 +85,6 @@ export const generateContent = (
         margin: [0, 3],
     }))
     const content = {
-        watermark: {
-            text: 'Hệ Thống Giáo Dục NQH',
-            color: 'black',
-            opacity: 0.05,
-            bold: '900',
-            italics: false,
-            fontSize: 60,
-        },
         background,
         content: [
             { ...imageHeadPdf },

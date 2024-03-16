@@ -120,7 +120,7 @@ const searchStudent = (event: any) => {
                     @change="searchStudent"
                 />
 
-                <USelect :options="['Toán', 'Lý', 'Hóa']" placeholder="Lớp" class="w-40" />
+                <!-- <USelect :options="['Toán', 'Lý', 'Hóa']" placeholder="Lớp" class="w-40" /> -->
             </div>
             <!-- <div class="overflow-auto h-full w-full flex-1"> -->
             <UTable
