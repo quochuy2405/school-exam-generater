@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
                 },
             } as any)
             const compileSource = handlebars.compile(data.source)
-            console.log('compileSource', data.body)
+
             const mailOptions = {
                 from: 'Hệ Thống Giáo Dục NQH <hethonggiaoducnqh@gmail.com>',
                 to: data.head.to,

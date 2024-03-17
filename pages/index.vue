@@ -227,7 +227,7 @@ async function onSubmit() {
             if (response.length) {
                 state.answer = response
                 if (!isOpen.value) {
-                  isOpen.value = true
+                    isOpen.value = true
                     onChangeTab(0)
                     addToHistory(state.students)
                 }
@@ -286,8 +286,8 @@ async function sendEmail(student: any, email: string): Promise<void> {
                 method: 'POST',
                 body: requestData.formData,
                 headers: requestData.fileHeaders,
-          }
-            console.log('requestInit', data)
+            }
+     
             try {
                 await $fetch('/api/user/email-sender', requestInit)
                     .then(() => {
@@ -503,6 +503,20 @@ const addToHistory = async (student: any) => {
                     <div class="flex">
                         <div class="p-4 h-fit flex">
                             <div class="flex flex-col gap-2 overflow-auto h-[80vh]">
+                                <p
+                                    class="border p-3 rounded-md font-semibold text-emerald-500"
+                                    v-if="
+                                        state.studentsInfo[
+                                            Number(state.studentActive['Số Báo Danh'])
+                                        ]?.['EMAIL']
+                                    "
+                                >
+                                    {{
+                                        state.studentsInfo[
+                                            Number(state.studentActive['Số Báo Danh'])
+                                        ]?.['EMAIL']
+                                    }}
+                                </p>
                                 <UButton
                                     v-for="(item, index) in state.students"
                                     :key="index"
@@ -542,15 +556,15 @@ const addToHistory = async (student: any) => {
                                     <UButton
                                         class="w-fit"
                                         @click="
-                                           async () => {
+                                            (async () => {
                                                 const student =
                                                     state.excercies[state.studentActive.index]
                                                 const email =
                                                     state.studentsInfo[
                                                         Number(student['Số Báo Danh'])
                                                     ]?.['EMAIL']
-                                             await   sendEmail(student, email)
-                                            }
+                                                await sendEmail(student, email)
+                                            })
                                         "
                                         >Gửi kết lời giải qua từng Email</UButton
                                     >
@@ -595,10 +609,9 @@ const addToHistory = async (student: any) => {
                                     <p
                                         class="text-[#0071bc] font-bold absolute left-[365px] top-[94px] opacity-95"
                                     >
-                                        <span >
+                                        <span>
                                             {{ filter.subject }}
                                         </span>
-                                      
                                     </p>
                                     <p
                                         class="text-[#0071bc] font-bold absolute left-[725px] top-[96px] opacity-95"
@@ -622,7 +635,7 @@ const addToHistory = async (student: any) => {
                                         <ol class="list-decimal p-5">
                                             <li v-for="item in state.studentActive.incorrerAnswer">
                                                 <a
-                                                    :href="item['Đường Dẫn'] "
+                                                    :href="item['Đường Dẫn']"
                                                     class="underline font-medium text-[#0071bc]"
                                                 >
                                                     {{ item['Câu Hỏi'] }} - {{ item['Giải pháp'] }}

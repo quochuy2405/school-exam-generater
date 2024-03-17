@@ -1,15 +1,13 @@
-import { Exam } from '~/server/models/exams.model'
+import { Student } from '~/server/models/student.model'
 
 export default defineEventHandler(async (event) => {
     const payload: any | null = await readBody(event)
-
-    const newExam = {
-        code: payload.code,
-        excercies: payload.excercies,
+    const dataUpdate = {
+        ...payload,
     }
     try {
-        await Exam.updateOne({ code: newExam.code }, { $set: newExam })
-        return newExam
+        await Student.updateOne({ SBD: dataUpdate.SBD }, { $set: dataUpdate })
+        return dataUpdate
     } catch (error) {
         console.log('error', error)
         return setResponseStatus(event, 404, 'Not updated')

@@ -1,7 +1,9 @@
 export const html_template = `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html dir="ltr" lang="vi">
+<html dir="ltr" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="vi">
  <head>
+  <link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
+  <link type="text/css" rel="stylesheet" id="dark-mode-general-link">
   <link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
   <link type="text/css" rel="stylesheet" id="dark-mode-general-link">
   <meta charset="UTF-8">
@@ -21,7 +23,8 @@ export const html_template = `
     </o:OfficeDocumentSettings>
 </xml>
 <![endif]--><!--[if !mso]><!-- -->
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap" rel="stylesheet"><!--<![endif]-->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600&display=swap" rel="stylesheet"><!--<![endif]--><!--[if !mso]><!-- -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i" rel="stylesheet"><!--<![endif]-->
   <style type="text/css">
 #outlook a {
 	padding:0;
@@ -51,10 +54,10 @@ a[x-apple-data-detectors] {
 @media screen and (max-width:384px) {.mail-message-content { width:414px!important } }
 </style>
  </head>
- <body data-new-gr-c-s-check-loaded="14.1162.0" data-gr-ext-installed style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
+ <body data-new-gr-c-s-loaded="14.1162.0" style="width:100%;font-family:arial, 'helvetica neue', helvetica, sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0">
   <div dir="ltr" class="es-wrapper-color" lang="vi" style="background-color:#02687F"><!--[if gte mso 9]>
 			<v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
-				<v:fill type="tile" src="https://tlr.stripocdn.email/content/guids/CABINET_6c7b2f5b32978d89c268e7ceeb7bad21/images/group_63_61d.png" color="#02687F" origin="0.5, 0" position="0.5, 0"></v:fill>
+				<v:fill type="tile" src="https://feapeec.stripocdn.email/content/guids/CABINET_6c7b2f5b32978d89c268e7ceeb7bad21/images/group_63_61d.png" color="#02687F" origin="0.5, 0" position="0.5, 0"></v:fill>
 			</v:background>
 		<![endif]-->
    <table class="es-wrapper" width="100%" cellspacing="0" cellpadding="0" background="https://feapeec.stripocdn.email/content/guids/CABINET_6c7b2f5b32978d89c268e7ceeb7bad21/images/group_63_61d.png" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-image:url(https://feapeec.stripocdn.email/content/guids/CABINET_6c7b2f5b32978d89c268e7ceeb7bad21/images/group_63_61d.png);background-repeat:no-repeat;background-position:center top;background-color:#02687F" role="none">
@@ -78,6 +81,12 @@ a[x-apple-data-detectors] {
                          </tr>
                        </table></td>
                      </tr>
+                     <tr>
+                      <td align="center" style="padding:0;Margin:0;font-size:0px"><img class="adapt-img" src="https://feapeec.stripocdn.email/content/guids/CABINET_0f006e71e94d38d98d201ca1a4dc5ebab341c121e95d797b1062e23ebdcd3b19/images/logohethonggiaoducnqhxanh_cbn.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="110"></td>
+                     </tr>
+                     <tr>
+                      <td align="center" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:43px;mso-line-height-rule:exactly;font-family:roboto, 'helvetica neue', helvetica, arial, sans-serif;font-size:36px;font-style:normal;font-weight:bold;color:#013F49"><strong><em></em>HỆ THỐNG GIÁO DỤC NQH</strong></h2></td>
+                     </tr>
                    </table></td>
                  </tr>
                </table></td>
@@ -88,28 +97,15 @@ a[x-apple-data-detectors] {
        <table cellpadding="0" cellspacing="0" class="es-content" align="center" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%">
          <tr>
           <td align="center" style="padding:0;Margin:0">
-           <table bgcolor="#ffffff" class="es-content-body" align="center" cellpadding="0" cellspacing="0" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;width:600px">
+           <table bgcolor="#ffffff" class="es-content-body" align="center" cellpadding="0" cellspacing="0" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:#FFFFFF;border-top:2px solid transparent;border-right:2px solid transparent;border-left:2px solid transparent;width:600px;border-bottom:2px solid transparent" role="none">
              <tr>
-              <td align="left" style="padding:0;Margin:0;padding-top:20px;padding-left:20px;padding-right:20px">
-               <table cellpadding="0" cellspacing="0" width="100%" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                 <tr>
-                  <td align="center" valign="top" style="padding:0;Margin:0;width:560px">
-                   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
-                     <tr>
-                      <td align="left" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:43px;mso-line-height-rule:exactly;font-family:Nunito, Roboto, sans-serif;font-size:36px;font-style:normal;font-weight:bold;color:#013F49">HỆ THỐNG GIÁO DỤC NQH</h2></td>
-                     </tr>
-                   </table></td>
-                 </tr>
-               </table></td>
-             </tr>
-             <tr>
-              <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:20px"><!--[if mso]><table style="width:580px" cellpadding="0" cellspacing="0"><tr><td style="width:204px" valign="top"><![endif]-->
+              <td align="left" style="padding:0;Margin:0;padding-top:10px;padding-left:20px"><!--[if mso]><table style="width:576px" cellpadding="0" cellspacing="0"><tr><td style="width:202px" valign="top"><![endif]-->
                <table cellpadding="0" cellspacing="0" class="es-left" align="left" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:left">
                  <tr>
-                  <td class="es-m-p20b" align="left" style="padding:0;Margin:0;width:204px">
+                  <td class="es-m-p20b" align="left" style="padding:0;Margin:0;width:202px">
                    <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                      <tr>
-                      <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px"><strong>Chào học viên:</strong></p></td>
+                      <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px"><strong>Chào học viên</strong></p></td>
                      </tr>
                      <tr>
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px">{{name}}</p></td>
@@ -121,20 +117,20 @@ a[x-apple-data-detectors] {
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px">{{sbd}}</p></td>
                      </tr>
                      <tr>
-                      <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px"><strong>Số điểm môn {{mon}} của bạn là:</strong></p></td>
+                      <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px"><strong>Số điểm {{mon}} của bạn là:&nbsp;</strong><br></p></td>
                      </tr>
                      <tr>
                       <td align="left" style="padding:0;Margin:0"><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;color:#02687F;font-size:14px">{{diem}}</p></td>
                      </tr>
                    </table></td>
                  </tr>
-               </table><!--[if mso]></td><td style="width:5px"></td><td style="width:371px" valign="top"><![endif]-->
+               </table><!--[if mso]></td><td style="width:5px"></td><td style="width:369px" valign="top"><![endif]-->
                <table cellpadding="0" cellspacing="0" class="es-right" align="right" role="none" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;float:right">
                  <tr>
-                  <td align="left" style="padding:0;Margin:0;width:371px">
+                  <td align="left" style="padding:0;Margin:0;width:369px">
                    <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
                      <tr>
-                      <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://viewstripo.email" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#53C7B4;font-size:14px"><img class="adapt-img" src="https://feapeec.stripocdn.email/content/guids/CABINET_6c7b2f5b32978d89c268e7ceeb7bad21/images/group_LdR.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="371"></a></td>
+                      <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://viewstripo.email" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#53C7B4;font-size:14px"><img class="adapt-img" src="https://feapeec.stripocdn.email/content/guids/CABINET_6c7b2f5b32978d89c268e7ceeb7bad21/images/group_LdR.png" alt style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" width="369"></a></td>
                      </tr>
                    </table></td>
                  </tr>
