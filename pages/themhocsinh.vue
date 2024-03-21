@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { thucchien, khuvuc } from '@/constants/options'
 import { z } from 'zod'
 
 definePageMeta({
@@ -7,8 +8,6 @@ definePageMeta({
         name: 'layout',
     },
 })
-
-const classes = ['Lớp 1', 'Lớp 2', 'Lớp 3']
 
 const columns = [
     {
@@ -40,21 +39,13 @@ const columns = [
         sortable: true,
         class: 'w-[120px]',
     },
-    //  {
-    //     key: 'SCORE',
-    //     label: 'Điểm',
-    //     sortable: true,
-    //     class: 'w-[120px]',
-    // },
 ]
-const schema = z.object({
-    code: z.string().min(10, 'Must be at least 10 characters'),
-})
 
 const toast = useToast()
 const state = reactive({
     code: undefined,
     class: undefined,
+    area: undefined,
     types: undefined,
     file: undefined,
     loading: false,
@@ -62,6 +53,14 @@ const state = reactive({
 })
 const page = ref(1)
 const pageCount = 20
+const schema = z.object({
+    class: z.string({
+        required_error: 'Vui lòng chọn lớp',
+    }),
+    area: z.string({
+        required_error: 'Vui lòng chọn khu vực',
+    }),
+})
 
 const handleChangeFile = (event: any) => {
     const reader = new FileReader()
@@ -76,10 +75,7 @@ const handleChangeFile = (event: any) => {
 }
 
 const rows = computed(() => {
-    const data = state.students?.slice(
-        (page.value - 1) * pageCount,
-        page.value * pageCount
-    )
+    const data = state.students?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
 
@@ -97,7 +93,9 @@ async function onSubmit(event: any) {
         return
     }
     state.loading = true
-    const dataCreate = state.students.filter((item: any) => item.SBD)
+    const dataCreate = state.students
+        .filter((item: any) => item.SBD)
+        .map((student: any) => ({ ...student, CLASS: state.class, AREA: state.area }))
 
     $fetch('/api/student/add', {
         method: 'POST',
@@ -135,69 +133,14 @@ async function onSubmit(event: any) {
 
 <template>
     <div class="flex h-full flex-col gap-3 w-full overflow-auto px-2 py-1">
-        <!-- <UCard>
-            <UForm
-                :schema="schema"
-                :state="state"
-                class="grid grid-cols-2 lg:w-3/5 gap-3"
-            >
-                <div class="flex flex-col gap-2">
-                    <UFormGroup
-                        label="Mã học sinh"
-                        name="class"
-                        eager-validation
-                    >
-                        <UInput
-                            v-model="state.code"
-                            placeholder="Nhập mã học sinh"
-                        />
-                    </UFormGroup>
-                    <UFormGroup
-                        label="Tên học sinh"
-                        name="code"
-                        eager-validation
-                    >
-                        <UInput
-                            v-model="state.code"
-                            placeholder="Nhập tên học sinh"
-                        />
-                    </UFormGroup>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <UFormGroup
-                        label="Email học sinh"
-                        name="file"
-                        eager-validation
-                    >
-                        <UInput
-                            v-model="state.code"
-                            placeholder="Nhập email học sinh"
-                        />
-                    </UFormGroup>
-                    <UFormGroup label="Lớp" name="class" eager-validation>
-                        <USelect
-                            v-model="state.class"
-                            placeholder="Lựa chọn lớp"
-                            :options="classes"
-                        />
-                    </UFormGroup>
-                </div>
-            </UForm>
-        </UCard>
-        <h1 class="font-medium">Hoặc</h1> -->
-
         <UForm
             :state="state"
+            :schema="schema"
             @submit="onSubmit"
             class="flex justify-between gap-6 items-end"
         >
             <div class="flex justify-start gap-6 items-end">
-                <UFormGroup
-                    label="Tải lên file csv"
-                    name="file"
-                    class="w-fit"
-                    eager-validation
-                >
+                <UFormGroup label="Tải lên file csv" name="file" class="w-fit" eager-validation>
                     <input
                         :model-value="state.file"
                         @change="handleChangeFile"
@@ -207,13 +150,24 @@ async function onSubmit(event: any) {
                         class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
                     />
                 </UFormGroup>
-                <!-- <UFormGroup label="Lớp đăng ký" name="class">
+                <UFormGroup label="Khu vực đăng ký" name="area" eager-validation required>
                     <USelect
-                        :options="['Toán', 'Lý', 'Hóa']"
+                        :options="khuvuc"
+                        placeholder="Khu vực"
+                        class="w-40"
+                        v-model="state.area"
+                    />
+                </UFormGroup>
+                <UFormGroup label="Lớp đăng ký" name="class" eager-validation required>
+                    <USelect
+                        :options="thucchien"
                         placeholder="Lớp"
                         class="w-40"
-                /></UFormGroup> -->
+                        v-model="state.class"
+                    />
+                </UFormGroup>
             </div>
+
             <UButton :loading="state.loading" type="submit" class="h-fit"
                 >Thêm tất cả học sinh</UButton
             >
@@ -238,9 +192,7 @@ async function onSubmit(event: any) {
             />
             <!-- </div> -->
 
-            <div
-                class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
-            >
+            <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
                 <UPagination
                     v-model="page"
                     :page-count="pageCount"

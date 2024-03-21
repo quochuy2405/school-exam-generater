@@ -59,7 +59,6 @@ const state = reactive({
 })
 const page = ref(1)
 const pageCount = 20
-const toast = useToast()
 
 const rows = computed(() => {
     const data = state.histories?.slice((page.value - 1) * pageCount, page.value * pageCount)

@@ -1,21 +1,21 @@
 export const studentColumns = [
     {
-        key: 'Họ và Tên',
+        key: 'HO VA TEN',
         label: 'Họ và Tên',
         class: 'w-[120px]',
     },
     {
-        key: 'Số Báo Danh',
+        key: 'SO BAO DANH',
         label: 'Số Báo Danh',
         class: 'w-[100px]',
     },
     {
-        key: 'Mã đề',
+        key: 'MA DE',
         label: 'Mã đề',
         class: 'w-[60px]',
     },
     {
-        key: 'Điểm',
+        key: 'DIEM',
         label: 'Điểm',
         class: 'w-[120px]',
     },

@@ -30,7 +30,7 @@ const columns = [
         key: 'Đáp Án',
         label: 'Đáp Án',
         sortable: true,
-        class: 'w-[100px]',
+        class: 'w-[80px]',
     },
     {
         key: 'Giải pháp',
@@ -40,6 +40,10 @@ const columns = [
     {
         key: 'Đường Dẫn',
         label: 'Đường dẫn',
+    },
+    {
+        key: 'Điểm',
+        label: 'Điểm',
     },
     { label: 'Chỉnh sửa', key: 'actions' },
 ]
@@ -82,6 +86,7 @@ const formEdit = reactive({
     solve: undefined,
     question: undefined,
     link: undefined,
+    score: undefined,
 })
 const isEdit = ref(false)
 const page = ref(1)
@@ -128,6 +133,7 @@ async function onUpdate(event: any) {
         'Giải pháp': event.data.solve,
         'Câu Hỏi': event.data.question,
         'Đường Dẫn': event.data.link,
+        Điểm: event.data.score,
     }
     const row = state.excercies.find((item: any) => item['STT'] === event.data.stt)
     Object.assign(row, body)
@@ -302,6 +308,15 @@ async function onDelete(event: any) {
                                 v-model="formEdit.link"
                                 placeholder="Nhập đường dẫn lời giải..."
                             />
+                        </UFormGroup>
+                        <UFormGroup
+                            label="Điểm"
+                            name="score"
+                            eager-validation
+                            required
+                            class="w-full"
+                        >
+                            <UInput v-model="formEdit.score" placeholder="Nhập điểm từng câu" />
                         </UFormGroup>
                         <UButton type="submit">Lưu đáp án</UButton>
                     </div>

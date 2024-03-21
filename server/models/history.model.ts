@@ -6,6 +6,7 @@ const HistorySchema = new Schema({
     NAME: String,
     MON: String,
     DOT: String,
+    KHUVUC: String,
     SCORE: Number,
     NGAY: Date,
 })

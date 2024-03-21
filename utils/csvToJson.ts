@@ -31,9 +31,8 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
         .split(',')
         .filter((header) => !!header?.trim())
         .map((item) => item?.trim())
-
     // Bắt đầu từ dòng startLineIndex, lặp qua số lượng linesToRead dòng và bỏ qua 3 dòng tiếp theo
-    for (let i = startLineIndex + 2; i < lines.length; i += 1) {
+    for (let i = startLineIndex + 1; i < lines.length; i += 1) {
         if (i >= lines.length) {
             // Kiểm tra nếu đã đọc hết dữ liệu
             break
@@ -41,8 +40,7 @@ export const readLinesFromCSV = (csvData: string, startLineIndex: number) => {
 
         const lineToRead = lines[i]
         const dataLineSplit = lineToRead.split(',')
-
-        if (!dataLineSplit[0]) continue
+        if (!dataLineSplit[1]?.trim()) continue
         const jsonDataLine = csvLineToJson(dataLineSplit, header) // Chuyển đổi dòng CSV thành JSON
 
         if (jsonDataLine !== null) {
@@ -64,7 +62,6 @@ const csvLineToJson = (dataLineSplit: Array<string>, header: any) => {
 
         entry[header[j]] = data[j]?.trim() || 'X' // Gán giá trị vào từng cột
     }
-
     return entry
 }
 
@@ -77,7 +74,7 @@ export const generateContent = (
     isNQH: boolean
 ) => {
     const ol = anwers?.map((item) => ({
-        text: `${item.question} (Bấm để xem đáp án)`,
+        text: `Con sai ${item.question} (Bấm để làm BT tương tự)`,
         link: item.link,
         decoration: 'underline',
         bold: '900',
@@ -92,7 +89,7 @@ export const generateContent = (
                 columns: [
                     {
                         width: '*',
-                        text: student['Họ và Tên'] || '',
+                        text: student?.['HO VA TEN'] || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -100,7 +97,7 @@ export const generateContent = (
                         absolutePosition: { x: 80, y: 47 },
                     },
                     {
-                        text: student?.['Số Báo Danh'] || '',
+                        text: student?.['SO BAO DANH'] || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
@@ -148,7 +145,7 @@ export const generateContent = (
                 ],
             },
             {
-                text: student['Mã đề'] || '',
+                text: student['MA DE'] || '',
 
                 bold: true,
                 alignment: 'center',

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { khuvuc, mon, thucchien } from '@/constants/options'
 import { studentColumns } from '@/constants/student'
 import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { z } from 'zod'
-import type { IFormData } from '../types'
 definePageMeta({
     layout: 'slot',
     layoutTransition: {
@@ -34,8 +34,9 @@ const state = reactive({
     },
 })
 const filter = reactive({
-    subject: 'Toán',
-    type: 'Thực chiến 1',
+    subject: '',
+    type: '',
+    area: '',
 })
 const page = ref(1)
 const pageCount = 10
@@ -46,8 +47,15 @@ const rows = computed(() => {
 })
 
 const schema = z.object({
-    subject: z.string(),
-    type: z.string(),
+    subject: z.string({
+        required_error: 'Vui lòng chọn môn học',
+    }),
+    type: z.string({
+        required_error: 'Vui lòng chọn lớp thực chiến',
+    }),
+    area: z.string({
+        required_error: 'Vui lòng chọn khu vực',
+    }),
 })
 const validate = (state: any): any[] => {
     const errors = []
@@ -57,7 +65,9 @@ const validate = (state: any): any[] => {
     if (!state.type) {
         errors.push({ path: 'type', message: 'Vui lòng chọn số thực chiến.' })
     }
-
+    if (!state.area) {
+        errors.push({ path: 'area', message: 'Vui lòng chọn khu vực.' })
+    }
     return errors
 }
 
@@ -84,13 +94,13 @@ const handleChangeFile = (event: any) => {
 
         state.students = state.excercies.map((item: any) => {
             return {
-                label: `${item['Họ và Tên']} (${item['Số Báo Danh']}) - ${item['Mã đề']}`,
-                content: `${item['Họ và Tên']} (${item['Số Báo Danh']}) - ${item['Mã đề']}`,
+                label: `${item['HO VA TEN']} (${item['SO BAO DANH']}) - ${item['MA DE']}`,
+                content: `${item['HO VA TEN']} (${item['SO BAO DANH']}) - ${item['MA DE']}`,
                 value: item,
                 slot: 'pdf',
             }
         })
-        const codes = state.excercies.map((item: any) => item['Số Báo Danh'])
+        const codes = state.excercies.map((item: any) => item['SO BAO DANH'])
 
         $fetch('/api/student/find', {
             method: 'POST',
@@ -133,16 +143,15 @@ const onPdfByStudent = async (student: any, download = false) => {
     }))
 
     const mark = onMarkStudent(student).mark
-
     const content = generateContent(
         student,
         answer,
         mark,
         filter.subject,
-        state?.studentsInfo?.[Number(student['Số Báo Danh'])]?.['SCHOOL'],
-        !!state?.studentsInfo?.[Number(student?.['Số Báo Danh'])]?.['NQH']
+        state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['SCHOOL'],
+        !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH']
     )
-    const filename = `${student['Số Báo Danh']}-${student['Mã đề']}-ThucChien1-2-3.pdf`
+    const filename = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.subject}.pdf`
     if (download) {
         pdfMaker.createPdf(JSON.parse(JSON.stringify(content))).getBlob((blob: any) => {
             const url = URL.createObjectURL(blob)
@@ -150,7 +159,7 @@ const onPdfByStudent = async (student: any, download = false) => {
             // Tạo một đường link để tải tệp PDF
             const link = document.createElement('a')
             link.href = url
-            link.download = filename || 'loigiai.pdf'
+            link.download = toNonAccentVietnamese(filename) || 'loigiai.pdf'
             link.click()
 
             // Giải phóng URL đối tượng khi đã sử dụng xong
@@ -162,7 +171,7 @@ const onPdfByStudent = async (student: any, download = false) => {
 
 const onMarkStudent = (student: any) => {
     const answer = state.answer.find((item: any) => {
-        return `${item.code}` == `${student['Mã đề']}`
+        return `${item.code}` == `${student['MA DE']}`
     })
 
     if (!answer) {
@@ -176,12 +185,11 @@ const onMarkStudent = (student: any) => {
     }
 
     const incorrerAnswer = checkAndGenerateAnswer(student, answer)
-
-    const mark = (
-        ((Object.keys(answer?.excercies)?.length - incorrerAnswer?.length) /
-            Object.keys(answer?.excercies)?.length) *
-        10
-    ).toFixed(1)
+    const subScore = incorrerAnswer.reduce((total: number, item: any) => {
+        if (Number.isNaN(Number(item['Điểm']))) return total
+        return total + Number(item['Điểm'])
+    }, 0.0)
+    const mark = (10 - subScore).toFixed(1)
     return { incorrerAnswer, mark } as any
 }
 const onLoadAnswer = () => {
@@ -199,7 +207,7 @@ async function onSubmit() {
 
         return
     }
-    const codes = state.excercies.map((item: any) => item['Mã đề'])
+    const codes = state.excercies.map((item: any) => item['MA DE'])
     const codesUnique = [...new Set(codes)]
     if (!codesUnique.length) {
         toast.add({
@@ -215,6 +223,7 @@ async function onSubmit() {
         Toán: 'toan',
         Lý: 'ly',
         Hóa: 'hoa',
+        Anh: 'anh',
     }
 
     const body = {
@@ -258,16 +267,16 @@ async function sendEmail(student: any, email: string): Promise<void> {
         const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
         await pdfDocGenerator.getBlob(async (pdf: string) => {
             const data: any = {
-                name: student['Họ và Tên'],
+                name: student['HO VA TEN'],
                 email: email,
                 subject: filter.subject,
                 diem: onMarkStudent(student).mark,
-                sbd: student['Số Báo Danh'],
+                sbd: student['SO BAO DANH'],
             }
             successMessage.value = null
-
+            const utf8EncodedFileName = toNonAccentVietnamese(filename)
             const headers = new Headers({
-                fileName: filename,
+                fileName: `${utf8EncodedFileName}`,
             })
 
             const form = new FormData()
@@ -287,11 +296,11 @@ async function sendEmail(student: any, email: string): Promise<void> {
                 body: requestData.formData,
                 headers: requestData.fileHeaders,
             }
-     
+
             try {
                 await $fetch('/api/user/email-sender', requestInit)
                     .then(() => {
-                        state.emailList.success.push(student['Số Báo Danh'])
+                        state.emailList.success.push(student['SO BAO DANH'])
                         successMessage.value = 'Email has been sent.'
                         toast.add({
                             title: 'Email đã được gửi đến ' + data.name,
@@ -309,6 +318,34 @@ async function sendEmail(student: any, email: string): Promise<void> {
                             icon: 'i-heroicons-exclamation-triangle',
                             color: 'orange',
                         })
+                        $fetch('/api/bin/add', {
+                            method: 'POST',
+                            body: {
+                                student: {
+                                    ...student,
+                                    type: filter.type,
+                                    area: filter.area,
+                                    subject: filter.subject,
+                                },
+                            },
+                        })
+                            .then(() => {
+                                toast.add({
+                                    title: 'Đã backup dữ liệu ' + data.name,
+                                    timeout: 3000,
+                                    icon: 'i-heroicons-exclamation-triangle',
+                                })
+                            })
+                            .catch(() => {
+                                toast.add({
+                                    title: 'Không thể backup dữ liệu ' + data.name,
+                                    description:
+                                        'Vui lòng tải file pdf xuống để tránh mất dữ liệu.',
+                                    timeout: 3000,
+                                    icon: 'i-heroicons-exclamation-triangle',
+                                    color: 'red',
+                                })
+                            })
                     })
                     .finally(() => {
                         state.loading = false
@@ -362,7 +399,7 @@ const downloadAll = async () => {
             // docArray here is array of docs contents
             const student = state.excercies[index]
             const answer = state.answer.find((item: any) => {
-                return item.code == `${student['Mã đề']}`
+                return item.code == `${student['MA DE']}`
             })
 
             const incorrerAnswer = checkAndGenerateAnswer(student, answer)
@@ -378,15 +415,16 @@ const downloadAll = async () => {
                 resolve,
                 mark,
                 filter.subject,
-                state?.studentsInfo?.[Number(student['Số Báo Danh'])]?.['SCHOOL'],
-                !!state?.studentsInfo?.[Number(student?.['Số Báo Danh'])]?.['NQH']
+                state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['SCHOOL'],
+                !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH']
             )
 
             const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
 
             pdfDocGenerator.getBlob(async (blob: string) => {
-                const name = `${student['Số Báo Danh']}-${student['Mã đề']}-ThucChien1-2-3.pdf`
-                state.zips.push({ name, blob })
+                const name = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.subject}.pdf`
+
+                state.zips.push({ name: toNonAccentVietnamese(name), blob })
             })
             index++
         } else {
@@ -408,7 +446,7 @@ const sendAllEmail = () => {
     intervalTime = setInterval(async function () {
         if (index < state.excercies.length) {
             const student = state.excercies[index]
-            const email = state.studentsInfo[Number(student['Số Báo Danh'])]?.['EMAIL']
+            const email = state.studentsInfo[Number(student['SO BAO DANH'])]?.['EMAIL']
 
             if (email) {
                 new Promise((resolve) => {
@@ -439,12 +477,13 @@ const addToHistory = async (student: any) => {
     const dataHistory = student.map((st: any) => {
         const student = st.value
         const { mark: SCORE } = onMarkStudent(student)
-        const MADE = st.value['Mã đề']
-        const NAME = st.value['Họ và Tên']
-        const SBD = st.value['Số Báo Danh']
+        const MADE = st.value['MA DE']
+        const NAME = st.value['HO VA TEN']
+        const SBD = st.value['SO BAO DANH']
         const NGAY = today
         const MON = filter.subject
         const DOT = filter.type
+        const KHUVUC = filter.area
         return {
             SCORE,
             MADE,
@@ -453,6 +492,7 @@ const addToHistory = async (student: any) => {
             NGAY,
             MON,
             DOT,
+            KHUVUC,
         }
     })
     await $fetch('/api/history/add', {
@@ -469,6 +509,16 @@ const addToHistory = async (student: any) => {
                 color: 'orange',
             })
         })
+}
+
+const sendEmailEarch = async () => {
+    try {
+        const student = state.excercies[state.studentActive.index]
+        const email = state.studentsInfo[Number(student['SO BAO DANH'])]?.['EMAIL']
+        await sendEmail(student, email)
+    } catch (error) {
+        console.log('error', error)
+    }
 }
 </script>
 
@@ -507,13 +557,13 @@ const addToHistory = async (student: any) => {
                                     class="border p-3 rounded-md font-semibold text-emerald-500"
                                     v-if="
                                         state.studentsInfo[
-                                            Number(state.studentActive['Số Báo Danh'])
+                                            Number(state.studentActive['SO BAO DANH'])
                                         ]?.['EMAIL']
                                     "
                                 >
                                     {{
                                         state.studentsInfo[
-                                            Number(state.studentActive['Số Báo Danh'])
+                                            Number(state.studentActive['SO BAO DANH'])
                                         ]?.['EMAIL']
                                     }}
                                 </p>
@@ -524,12 +574,12 @@ const addToHistory = async (student: any) => {
                                     :class="[
                                         !!state.emailList.success.length &&
                                             !state.emailList.success.includes(
-                                                item.value['Số Báo Danh']
+                                                item.value['SO BAO DANH']
                                             ) &&
-                                            'bg-red-500',
-                                        state.studentActive['Số Báo Danh'] ===
-                                            `${item.value['Số Báo Danh']}` &&
-                                            'bg-black hover:bg-black',
+                                            'bg-white text-black',
+                                        state.studentActive['SO BAO DANH'] ===
+                                            `${item.value['SO BAO DANH']}` &&
+                                            'bg-black text-white hover:bg-black',
                                         ,
                                     ]"
                                     @click="() => onChangeTab(index)"
@@ -553,19 +603,7 @@ const addToHistory = async (student: any) => {
                                         >Tải bản từng bản PDF lời giải</UButton
                                     >
 
-                                    <UButton
-                                        class="w-fit"
-                                        @click="
-                                            (async () => {
-                                                const student =
-                                                    state.excercies[state.studentActive.index]
-                                                const email =
-                                                    state.studentsInfo[
-                                                        Number(student['Số Báo Danh'])
-                                                    ]?.['EMAIL']
-                                                await sendEmail(student, email)
-                                            })
-                                        "
+                                    <UButton class="w-fit" @click="sendEmailEarch"
                                         >Gửi kết lời giải qua từng Email</UButton
                                     >
                                 </div>
@@ -576,36 +614,52 @@ const addToHistory = async (student: any) => {
                                     <img src="/pdf-layout.png" width="100%" />
 
                                     <span
-                                        class="text-[#0071bc] font-bold absolute left-[100px] top-[60px] opacity-95"
-                                        v-if="state?.studentActive['Họ và Tên']"
-                                        >{{ state.studentActive['Họ và Tên'] }}</span
+                                        class="text-[#0071bc] font-bold absolute left-[105px] top-[60px] opacity-95"
+                                        v-if="state?.studentActive['HO VA TEN']"
+                                        >{{ state.studentActive['HO VA TEN'] }}</span
                                     >
 
                                     <span
                                         class="text-[#0071bc] font-bold absolute left-[425px] top-[60px] opacity-95"
-                                        v-if="state?.studentActive['Số Báo Danh']"
-                                        >{{ state.studentActive['Số Báo Danh'] }}</span
+                                        v-if="state?.studentActive['SO BAO DANH']"
+                                        >{{ state.studentActive['SO BAO DANH'] }}</span
                                     >
 
-                                    <span
+                                    <!-- <span
                                         class="text-[#0071bc] font-bold absolute left-[90px] top-[93px] opacity-95"
                                         v-if="
                                             state.studentsInfo[
-                                                Number(state.studentActive['Số Báo Danh'])
+                                                Number(state.studentActive['SO BAO DANH'])
                                             ]?.['SCHOOL']
                                         "
                                         >{{
                                             state.studentsInfo[
-                                                Number(state.studentActive['Số Báo Danh'])
+                                                Number(state.studentActive['SO BAO DANH'])
                                             ]?.['SCHOOL']
                                         }}</span
-                                    >
+                                    > -->
 
                                     <span
                                         class="text-[#0071bc] font-bold absolute left-[645px] top-[60px] opacity-95"
                                     >
                                         NQH Quận 10
                                     </span>
+                                    <p
+                                        class="text-[#0071bc] font-bold absolute left-[95px] top-[94px] opacity-95"
+                                    >
+                                        <span
+                                            v-if="
+                                                state.studentsInfo[
+                                                    Number(state.studentActive['SO BAO DANH'])
+                                                ]?.['SCHOOL']
+                                            "
+                                            >{{
+                                                state.studentsInfo[
+                                                    Number(state.studentActive['SO BAO DANH'])
+                                                ]?.['SCHOOL']
+                                            }}</span
+                                        >
+                                    </p>
                                     <p
                                         class="text-[#0071bc] font-bold absolute left-[365px] top-[94px] opacity-95"
                                     >
@@ -617,7 +671,7 @@ const addToHistory = async (student: any) => {
                                         class="text-[#0071bc] font-bold absolute left-[725px] top-[96px] opacity-95"
                                         :class="[
                                             !state.studentsInfo[
-                                                Number(state.studentActive['Số Báo Danh'])
+                                                Number(state.studentActive['SO BAO DANH'])
                                             ]?.['NQH'] && 'left-[825px]',
                                         ]"
                                     >
@@ -626,8 +680,8 @@ const addToHistory = async (student: any) => {
                                     <p
                                         class="text-[#0071bc] font-bold absolute left-[635px] top-[155px] opacity-95 text-xl"
                                     >
-                                        <span v-if="state?.studentActive['Mã đề']">{{
-                                            state.studentActive['Mã đề']
+                                        <span v-if="state?.studentActive['MA DE']">{{
+                                            state.studentActive['MA DE']
                                         }}</span>
                                     </p>
 
@@ -638,7 +692,8 @@ const addToHistory = async (student: any) => {
                                                     :href="item['Đường Dẫn']"
                                                     class="underline font-medium text-[#0071bc]"
                                                 >
-                                                    {{ item['Câu Hỏi'] }} - {{ item['Giải pháp'] }}
+                                                    Con sai {{ item['Câu Hỏi'] }} => Con hãy làm
+                                                    {{ item['Giải pháp'] }}
                                                 </a>
                                             </li>
                                         </ol>
@@ -676,15 +731,23 @@ const addToHistory = async (student: any) => {
                 <UFormGroup label="Môn" name="subject" eager-validation required>
                     <USelect
                         v-model="filter.subject"
-                        :options="['Toán', 'Lý', 'Hóa']"
+                        :options="mon"
                         placeholder="Lớp"
+                        class="w-40"
+                    />
+                </UFormGroup>
+                <UFormGroup label="Khu vực" name="area" eager-validation required>
+                    <USelect
+                        v-model="filter.area"
+                        :options="khuvuc"
+                        placeholder="Khu vực"
                         class="w-40"
                     />
                 </UFormGroup>
                 <UFormGroup label="Số thực chiến" name="type" eager-validation required>
                     <USelect
-                        :options="['Thực chiến 1', 'Thực chiến 2']"
-                        placeholder="Lớp"
+                        :options="thucchien"
+                        placeholder="Số thực chiến"
                         class="w-40"
                         v-model="filter.type"
                     />

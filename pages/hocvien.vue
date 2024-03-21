@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { khuvuc, thucchien } from '@/constants/options';
+
 definePageMeta({
     layout: 'slot',
     layoutTransition: {
@@ -10,7 +12,7 @@ const columns = [
     {
         key: 'SBD',
         label: 'Số báo danh',
-        class: 'w-[120px]',
+        class: 'w-[100px]',
     },
     {
         key: 'NAME',
@@ -39,12 +41,12 @@ const columns = [
     {
         key: 'sua',
         label: 'Chỉnh sửa',
-        class: 'w-[120px]',
+        class: 'w-[100px]',
     },
     {
         key: 'actions',
         label: 'Lịch sử điểm',
-        class: 'w-[120px]',
+        class: 'w-[150px]',
     },
 ]
 
@@ -59,6 +61,10 @@ const state = reactive({
 const page = ref(1)
 const pageCount = 20
 const toast = useToast()
+const form = reactive({
+    select: undefined,
+    area: undefined,
+})
 const formEdit = reactive({
     SBD: undefined,
     NAME: undefined,
@@ -71,10 +77,14 @@ const rows = computed(() => {
     const data = state.excercies?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
-const getAll = () => {
+const getByClass = (className?: string, area?: string) => {
     state.loading = true
-    $fetch('/api/student/all', {
+    $fetch('/api/student/class', {
         method: 'POST',
+        body: {
+            CLASS: className,
+            AREA: area,
+        },
     })
         .then((data) => {
             state.excercies = data
@@ -86,14 +96,13 @@ const getAll = () => {
                 icon: 'i-heroicons-exclamation-triangle',
                 color: 'red',
             })
+            state.excercies = []
         })
         .finally(() => {
             state.loading = false
         })
 }
-onMounted(() => {
-    getAll()
-})
+
 const searchStudent = (event: any) => {
     state.loading = true
     $fetch('/api/student/search', {
@@ -126,7 +135,7 @@ async function onUpdate(event: any) {
             toast.add({ title: 'Đã cập nhật', timeout: 3000 })
             isEdit.value = false
             Object.assign(formEdit, {})
-            getAll()
+            getByClass(event.class)
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
@@ -149,7 +158,7 @@ async function onDelete(SBD: any) {
             toast.add({ title: 'Đã xóa', timeout: 3000 })
             isEdit.value = false
             Object.assign(formEdit, {})
-            getAll()
+            getByClass(form.select, form.area)
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
@@ -183,12 +192,15 @@ const items = (row: any) => [
             label: 'Delete',
             icon: 'i-heroicons-trash-20-solid',
             click: () => {
-                console.log('row', row['SBD'])
                 onDelete(row['SBD'])
             },
         },
     ],
 ]
+
+watchEffect(() => {
+    if (form.select) getByClass(form.select, form.area)
+})
 </script>
 
 <template>
@@ -203,8 +215,20 @@ const items = (row: any) => [
                     placeholder="Tìm kiếm số báo danh..."
                     @change="searchStudent"
                 />
-
-                <!-- <USelect :options="['Toán', 'Lý', 'Hóa']" placeholder="Lớp" class="w-40" /> -->
+                <div class="flex gap-3">
+                    <USelect
+                        :options="khuvuc"
+                        placeholder="Khu vực"
+                        class="w-40"
+                        v-model="form.area"
+                    />
+                    <USelect
+                        :options="thucchien"
+                        placeholder="Lớp"
+                        class="w-40"
+                        v-model="form.select"
+                    />
+                </div>
             </div>
             <!-- <div class="overflow-auto h-full w-full flex-1"> -->
             <UTable

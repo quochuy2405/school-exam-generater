@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { thucchien } from '@/constants/options';
 import { z } from 'zod'
 
 definePageMeta({
@@ -30,7 +31,7 @@ const columns = [
         key: 'Đáp Án',
         label: 'Đáp Án',
         sortable: true,
-        class: 'w-[200px]',
+        class: 'w-[100px]',
     },
     {
         key: 'Giải pháp',
@@ -40,6 +41,10 @@ const columns = [
     {
         key: 'Đường Dẫn',
         label: 'Đường dẫn',
+    },
+    {
+        key: 'Điểm',
+        label: 'Điểm',
     },
 ]
 const toast = useToast()
@@ -67,14 +72,14 @@ const handleChangeFile = (event: any) => {
 }
 
 const rows = computed(() => {
-    const data = state.excercies?.slice(
-        (page.value - 1) * pageCount,
-        page.value * pageCount
-    )
+    const data = state.excercies?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
 const schema = z.object({
     code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
+    type: z.string({
+        required_error: 'Vui lòng chọn số thực chiến',
+    }),
 })
 const validate = (state: any): any[] => {
     const errors = []
@@ -172,26 +177,14 @@ async function onSubmit(event: any) {
                                 :options="classes"
                             />
                         </UFormGroup> -->
-                        <UFormGroup
-                            label="Mã đề"
-                            name="code"
-                            eager-validation
-                            required
-                        >
-                            <UInput
-                                v-model="state.code"
-                                placeholder="Nhập mã đề"
-                            />
+                        <UFormGroup label="Mã đề" name="code" eager-validation required>
+                            <UInput v-model="state.code" placeholder="Nhập mã đề" />
                         </UFormGroup>
-                        <UFormGroup
-                            label="Số thực chiến"
-                            name="type"
-                            eager-validation
-                        >
+                        <UFormGroup label="Số thực chiến" name="type" eager-validation required>
                             <USelect
                                 v-model="state.type"
                                 placeholder="Chọn số thực chiến"
-                                :options="['Thực chiến 1', 'Thực chiến 2']"
+                                :options="thucchien"
                             />
                         </UFormGroup>
                     </div>
@@ -207,11 +200,7 @@ async function onSubmit(event: any) {
                                 :options="types"
                             />
                         </UFormGroup> -->
-                        <UFormGroup
-                            label="Tải lên file csv"
-                            name="file"
-                            eager-validation
-                        >
+                        <UFormGroup label="Tải lên file csv" name="file" eager-validation>
                             <input
                                 :model-value="state.file"
                                 @change="handleChangeFile"
@@ -225,9 +214,7 @@ async function onSubmit(event: any) {
                 </div>
 
                 <div class="flex justify-end">
-                    <UButton type="submit" class="h-fit w-fit px-2"
-                        >Thêm bộ câu hỏi</UButton
-                    >
+                    <UButton type="submit" class="h-fit w-fit px-2">Thêm bộ câu hỏi</UButton>
                 </div>
             </UForm>
         </UCard>
@@ -252,9 +239,7 @@ async function onSubmit(event: any) {
             />
             <!-- </div> -->
 
-            <div
-                class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700"
-            >
+            <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
                 <UPagination
                     v-model="page"
                     :page-count="pageCount"

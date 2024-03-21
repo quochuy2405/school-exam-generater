@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { thucchien } from '@/constants/options';
 import { z } from 'zod'
 
 definePageMeta({
@@ -141,7 +142,7 @@ onMounted(() => {
                                 class="min-w-[160px]"
                                 v-model="state.type"
                                 placeholder="Chọn số thực chiến"
-                                :options="['Thực chiến 1', 'Thực chiến 2']"
+                                :options="thucchien"
                             />
                         </UFormGroup>
                         <UButton @click="getAll" class="h-fit mt-6 w-fit px-2">Bỏ lọc</UButton>

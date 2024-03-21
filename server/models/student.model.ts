@@ -8,6 +8,8 @@ const StudentSchema = new Schema({
     EMAIL: String,
     SCHOOL: String,
     NQH: Number,
+    CLASS: String,
+    AREA: String,
 })
 
 export const Student = model('Student', StudentSchema)

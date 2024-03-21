@@ -15,6 +15,7 @@ import { ItemNav } from '../atoms'
             <ItemNav href="/quanlydapan/toan" name="Môn Toán" />
             <ItemNav href="/quanlydapan/ly" name="Môn Lý" />
             <ItemNav href="/quanlydapan/hoa" name="Môn Hóa" />
+            <ItemNav href="/quanlydapan/anh" name="Môn Anh" />
             <!-- <ItemNav href="/quanlydapan/danhgia" name="Đánh giá năng lực" /> -->
         </div>
     </UCard>
