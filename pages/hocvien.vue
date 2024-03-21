@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { khuvuc, thucchien } from '@/constants/options';
+import { khuvuc, thucchien } from '@/constants/options'
 
 definePageMeta({
     layout: 'slot',
@@ -61,6 +61,8 @@ const state = reactive({
 const page = ref(1)
 const pageCount = 20
 const toast = useToast()
+const router = useRouter()
+const params = useRoute()
 const form = reactive({
     select: undefined,
     area: undefined,
@@ -199,7 +201,15 @@ const items = (row: any) => [
 ]
 
 watchEffect(() => {
-    if (form.select) getByClass(form.select, form.area)
+    router.push({
+        path: '/hocvien',
+        query: { select: form.select, area: form.area },
+    })
+})
+
+watchEffect(() => {
+    const search = params.query
+    if (search.select && search.area) getByClass(search.select, search.area)
 })
 </script>
 
@@ -251,7 +261,7 @@ watchEffect(() => {
                 </template>
                 <template #actions-data="{ row }">
                     <UButton
-                        :to="`/lichsuthi/${row['SBD']}`"
+                        :to="`/lichsuthi/${row['AREA']}/${row['SBD']}`"
                         color="primary"
                         label="Xem lịch sử điểm"
                     />

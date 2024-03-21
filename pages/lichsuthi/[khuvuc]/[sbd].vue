@@ -51,6 +51,7 @@ const columns = [
 ]
 
 const router = useRoute()
+const nav = useRouter()
 
 const state = reactive({
     code: undefined,
@@ -64,11 +65,17 @@ const rows = computed(() => {
     const data = state.histories?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
+const linkBack = computed(() => {
+  const link = `/hocvien?area='${router.params.khuvuc}'&select='${rows.value?.[0]?.['DOT']}'`
+    console.log('link', link)
+    return link
+})
 const loadHistory = () => {
     $fetch('/api/history/find', {
         method: 'POST',
         body: {
             SBD: router.params.sbd,
+            KHUVUC: router.params.khuvuc,
         },
     })
         .then((data) => {
@@ -86,7 +93,7 @@ onMounted(() => loadHistory())
         <div
             class="w-full flex-1 flex flex-col h-full bg-white rounded-md shadow-sm border overflow-hidden"
         >
-            <UButton class="w-fit m-4">Quay lại</UButton>
+            <UButton class="w-fit m-4" @click="()=> nav.push(linkBack)">Quay lại</UButton>
             <UTable
                 sort-asc-icon="i-heroicons-arrow-up-20-solid"
                 sort-desc-icon="i-heroicons-arrow-down-20-solid"
@@ -101,14 +108,6 @@ onMounted(() => loadHistory())
                 :columns="columns"
                 :rows="rows"
             >
-                <template #actions-data="{ row }">
-                    <UButton
-                        href="/lichsuthi"
-                        color="primary"
-                        label="Xem lịch sử điểm"
-                        icon="i-heroicons-ellipsis-horizontal-20-solid"
-                    />
-                </template>
             </UTable>
             <!-- </div> -->
 
