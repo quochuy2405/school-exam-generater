@@ -4,6 +4,11 @@ import { ItemNav } from '../atoms'
 
 <template>
     <UCard class="h-full !max-h-[100dvh] max-w-[30%] w-64" padding="0">
+        <img
+            src="https://feapeec.stripocdn.email/content/guids/CABINET_0f006e71e94d38d98d201ca1a4dc5ebab341c121e95d797b1062e23ebdcd3b19/images/logohethonggiaoducnqhxanh_cbn.png"
+            alt=""
+            class="w-[140px] m-auto"
+        />
         <div class="mt-5 flex flex-col gap-3">
             <h3 class="font-normal text-gray-600 text-xs">MAIN MENU</h3>
             <div class="flex flex-col gap-2">
