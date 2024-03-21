@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { thucchien } from '@/constants/options';
+import { thucchien } from '@/constants/options'
 import { z } from 'zod'
 
 definePageMeta({
@@ -14,12 +14,6 @@ const columns = [
         key: 'STT',
         label: 'STT',
         class: 'w-[60px]',
-    },
-    {
-        key: 'Câu Hỏi',
-        label: 'Câu Hỏi',
-        sortable: true,
-        class: 'w-[200px]',
     },
     {
         key: 'Dạng',
@@ -53,6 +47,7 @@ const state = reactive({
     code: undefined,
     class: undefined,
     type: undefined,
+    khoi: undefined,
     file: undefined,
     excercies: [] as any,
 })
@@ -79,6 +74,9 @@ const schema = z.object({
     code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
     type: z.string({
         required_error: 'Vui lòng chọn số thực chiến',
+    }),
+    khoi: z.string({
+        required_error: 'Vui lòng chọn khối',
     }),
 })
 const validate = (state: any): any[] => {
@@ -116,6 +114,7 @@ async function onSubmit(event: any) {
     const dataCreate = {
         code: event.data.code,
         type: event.data.type,
+        khoi: event.data.khoi,
         subject: router.params.slug,
         excercies: { ...event.data.excercies },
     }
@@ -185,6 +184,14 @@ async function onSubmit(event: any) {
                                 v-model="state.type"
                                 placeholder="Chọn số thực chiến"
                                 :options="thucchien"
+                            />
+                        </UFormGroup>
+                        <UFormGroup label="Khối" name="khoi" eager-validation required>
+                            <USelect
+                                class="min-w-[160px]"
+                                v-model="state.khoi"
+                                placeholder="Chọn khối"
+                                :options="[9, 12]"
                             />
                         </UFormGroup>
                     </div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { thucchien } from '@/constants/options';
+import { thucchien } from '@/constants/options'
 import { z } from 'zod'
 
 definePageMeta({
@@ -26,6 +26,12 @@ const columns = [
         class: 'min-w-[100px]',
     },
     {
+        key: 'khoi',
+        label: 'Khối',
+        sortable: true,
+        class: 'min-w-[100px]',
+    },
+    {
         key: 'type',
         label: 'Số thực chiến',
         sortable: true,
@@ -40,7 +46,7 @@ const items = (row: any) => [
             icon: 'i-heroicons-pencil-square-20-solid',
             click: () => {
                 navigation.push({
-                    path: `/quanlydapan/${router.params.slug}/${row.code}/${row.type}`,
+                    path: `/quanlydapan/${router.params.slug}/${row.code}/${row.khoi}/${row.type}`,
                 })
             },
         },
@@ -51,6 +57,7 @@ const state = reactive({
     code: '',
     loading: false,
     type: '',
+    khoi: '',
     exams: [] as any,
 })
 
@@ -63,11 +70,23 @@ const rows = computed(() => {
 })
 const schema = z.object({
     code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
+    khoi: z.string({
+        required_error: 'Vui lòng chọn khối',
+    }),
+    type: z.string({
+        required_error: 'Vui lòng chọn số thực chiến',
+    }),
 })
 const validate = (state: any): any[] => {
     const errors = []
     if (!state.code) {
         errors.push({ path: 'code', message: 'Vui lòng nhập mã đề' })
+    }
+    if (!state.khoi) {
+        errors.push({ path: 'khoi', message: 'Vui lòng chọn khối' })
+    }
+    if (!state.type) {
+        errors.push({ path: 'type', message: 'Vui lòng chọn số thực chiến' })
     }
 
     return errors
@@ -79,6 +98,7 @@ async function onSubmit(event: any) {
     const body = {
         code: event.data.code,
         type: event.data.type,
+        khoi: event.data.khoi,
         subject: router.params.slug,
     }
     $fetch('/api/exam/find', { method: 'POST', body })
@@ -137,7 +157,15 @@ onMounted(() => {
                                 placeholder="Nhập mã đề"
                             />
                         </UFormGroup>
-                        <UFormGroup label="Số thực chiến" name="type" eager-validation>
+                        <UFormGroup label="Khối" name="khoi" eager-validation required>
+                            <USelect
+                                class="min-w-[160px]"
+                                v-model="state.khoi"
+                                placeholder="Chọn khối"
+                                :options="[9, 12]"
+                            />
+                        </UFormGroup>
+                        <UFormGroup label="Số thực chiến" name="type" eager-validation required>
                             <USelect
                                 class="min-w-[160px]"
                                 v-model="state.type"

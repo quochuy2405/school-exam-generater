@@ -13,6 +13,8 @@ async function checkingAndAdding(docs: any) {
             MON: doc.MON,
             DOT: doc.DOT,
             KHUVUC: doc.KHUVUC,
+            KHOI: doc.KHOI,
+            COSO: doc.COSO,
             NGAY: { $gte: today },
         })
         if (count === 0) {

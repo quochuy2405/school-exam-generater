@@ -10,6 +10,8 @@ const StudentSchema = new Schema({
     NQH: Number,
     CLASS: String,
     AREA: String,
+    COSO: String,
+    KHOI: String,
 })
 
 export const Student = model('Student', StudentSchema)

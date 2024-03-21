@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { khuvuc, mon, thucchien } from '@/constants/options'
+import { coso, khuvuc, mon, thucchien } from '@/constants/options'
 import { studentColumns } from '@/constants/student'
 import { generateContent, readLinesFromCSV } from '@/utils/csvToJson'
 import { saveAs } from 'file-saver'
@@ -36,6 +36,8 @@ const state = reactive({
 const filter = reactive({
     subject: '',
     type: '',
+    khoi: '',
+    coso: '',
     area: '',
 })
 const page = ref(1)
@@ -100,18 +102,6 @@ const handleChangeFile = (event: any) => {
                 slot: 'pdf',
             }
         })
-        const codes = state.excercies.map((item: any) => item['SO BAO DANH'])
-
-        $fetch('/api/student/find', {
-            method: 'POST',
-            body: { codes },
-        }).then((studentsInfo) => {
-            let keyMap = {}
-            studentsInfo.forEach((item: any) => {
-                keyMap = { ...keyMap, [item.SBD]: item }
-            })
-            state.studentsInfo = keyMap
-        })
     }
     reader.readAsText(file)
     state.file = file
@@ -138,7 +128,7 @@ const onPdfByStudent = async (student: any, download = false) => {
     student.incorrerAnswer = incorrerAnswer
     // playground requires you to assign document definition to a variable called dd
     const answer = student?.incorrerAnswer?.map((item: any) => ({
-        question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
+        question: `${item['Dạng']} - ${item['Giải pháp']}`,
         link: item['Đường Dẫn'],
     }))
 
@@ -149,7 +139,8 @@ const onPdfByStudent = async (student: any, download = false) => {
         mark,
         filter.subject,
         state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['SCHOOL'],
-        !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH']
+        !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH'],
+        state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['COSO']
     )
     const filename = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.subject}.pdf`
     if (download) {
@@ -230,15 +221,46 @@ async function onSubmit() {
         code: codesUnique,
         type: filter.type,
         subject: subjectConvert[filter.subject],
+        coso: filter.coso,
+        khoi: filter.khoi,
     }
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
             if (response.length) {
                 state.answer = response
+                const codes = state.excercies.map((item: any) => item['SO BAO DANH'])
+
+                $fetch('/api/student/find', {
+                    method: 'POST',
+                    body: {
+                        codes,
+                        type: filter.type,
+                        coso: filter.coso,
+                        area: filter.area,
+                        khoi: filter.khoi,
+                    },
+                })
+                    .then((studentsInfo) => {
+                        let keyMap = {}
+                        studentsInfo.forEach((item: any) => {
+                            keyMap = { ...keyMap, [item.SBD]: item }
+                        })
+                        console.log('keyMap', keyMap)
+                        state.studentsInfo = keyMap
+                        addToHistory(state.students)
+                    })
+                    .catch(() => {
+                        toast.add({
+                            title: 'Không tìm thấy thông tin học sinh',
+                            description: 'Vui lòng kiểm tra lại các ô lựa chọn',
+                            timeout: 3000,
+                            icon: 'i-heroicons-exclamation-triangle',
+                            color: 'orange',
+                        })
+                    })
                 if (!isOpen.value) {
                     isOpen.value = true
                     onChangeTab(0)
-                    addToHistory(state.students)
                 }
             } else {
                 throw ''
@@ -258,7 +280,7 @@ async function onSubmit() {
         })
 }
 
-async function sendEmail(student: any, email: string): Promise<void> {
+async function sendEmail(student: any, email: string) {
     state.loading = true
 
     try {
@@ -297,71 +319,59 @@ async function sendEmail(student: any, email: string): Promise<void> {
                 headers: requestData.fileHeaders,
             }
 
-            try {
-                await $fetch('/api/user/email-sender', requestInit)
-                    .then(() => {
-                        state.emailList.success.push(student['SO BAO DANH'])
-                        successMessage.value = 'Email has been sent.'
-                        toast.add({
-                            title: 'Email đã được gửi đến ' + data.name,
-                            timeout: 3000,
-                            icon: 'i-heroicons-check-circle',
-                        })
+            $fetch('/api/user/email-sender', requestInit)
+                .then(() => {
+                    state.emailList.success.push(student['SO BAO DANH'])
+                    successMessage.value = 'Email has been sent.'
+                    toast.add({
+                        title: 'Email đã được gửi đến ' + data.name,
+                        timeout: 3000,
+                        icon: 'i-heroicons-check-circle',
                     })
-                    .catch((error) => {
-                        state.loading = false
-                        console.log('error', error)
-                        toast.add({
-                            title: 'Gửi email lỗi đến ' + data.name,
-                            description: 'Vui lòng kiểm tra lại địa chỉ email.',
-                            timeout: 3000,
-                            icon: 'i-heroicons-exclamation-triangle',
-                            color: 'orange',
-                        })
-                        $fetch('/api/bin/add', {
-                            method: 'POST',
-                            body: {
-                                student: {
-                                    ...student,
-                                    type: filter.type,
-                                    area: filter.area,
-                                    subject: filter.subject,
-                                },
-                            },
-                        })
-                            .then(() => {
-                                toast.add({
-                                    title: 'Đã backup dữ liệu ' + data.name,
-                                    timeout: 3000,
-                                    icon: 'i-heroicons-exclamation-triangle',
-                                })
-                            })
-                            .catch(() => {
-                                toast.add({
-                                    title: 'Không thể backup dữ liệu ' + data.name,
-                                    description:
-                                        'Vui lòng tải file pdf xuống để tránh mất dữ liệu.',
-                                    timeout: 3000,
-                                    icon: 'i-heroicons-exclamation-triangle',
-                                    color: 'red',
-                                })
-                            })
-                    })
-                    .finally(() => {
-                        state.loading = false
-                    })
-            } catch (error) {
-                state.loading = false
-                console.log(error)
-                toast.add({
-                    title: 'Gửi email lỗi đến ' + data.name,
-                    description: 'Vui lòng kiểm tra lại địa chỉ email.',
-                    timeout: 3000,
-                    icon: 'i-heroicons-exclamation-triangle',
-                    color: 'orange',
                 })
-            }
+                .catch((error) => {
+                    state.loading = false
+                    console.log('error', error)
+                    toast.add({
+                        title: 'Gửi email lỗi đến ' + data.name,
+                        description: 'Vui lòng kiểm tra lại địa chỉ email.',
+                        timeout: 3000,
+                        icon: 'i-heroicons-exclamation-triangle',
+                        color: 'orange',
+                    })
+                    $fetch('/api/bin/add', {
+                        method: 'POST',
+                        body: {
+                            student: {
+                                ...student,
+                                type: filter.type,
+                                area: filter.area,
+                                subject: filter.subject,
+                            },
+                        },
+                    })
+                        .then(() => {
+                            toast.add({
+                                title: 'Đã backup dữ liệu ' + data.name,
+                                timeout: 3000,
+                                icon: 'i-heroicons-exclamation-triangle',
+                            })
+                        })
+                        .catch(() => {
+                            toast.add({
+                                title: 'Không thể backup dữ liệu ' + data.name,
+                                description: 'Vui lòng tải file pdf xuống để tránh mất dữ liệu.',
+                                timeout: 3000,
+                                icon: 'i-heroicons-exclamation-triangle',
+                                color: 'red',
+                            })
+                        })
+                })
+                .finally(() => {
+                    state.loading = false
+                })
         })
+        return 1
     } catch (error) {
         state.loading = false
         toast.add({
@@ -371,6 +381,7 @@ async function sendEmail(student: any, email: string): Promise<void> {
             icon: 'i-heroicons-exclamation-triangle',
             color: 'orange',
         })
+        return 0
     }
 }
 
@@ -406,7 +417,7 @@ const downloadAll = async () => {
             student.incorrerAnswer = incorrerAnswer
             // playground requires you to assign document definition to a variable called dd
             const resolve = incorrerAnswer?.map((item: any) => ({
-                question: `${item['Câu Hỏi']} - ${item['Giải pháp']}`,
+                question: `${item['Dạng']} - ${item['Giải pháp']}`,
                 link: item['Đường Dẫn'],
             }))
             const mark = onMarkStudent(student).mark
@@ -416,7 +427,8 @@ const downloadAll = async () => {
                 mark,
                 filter.subject,
                 state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['SCHOOL'],
-                !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH']
+                !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH'],
+                state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['COSO']
             )
 
             const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
@@ -450,8 +462,7 @@ const sendAllEmail = () => {
 
             if (email) {
                 new Promise((resolve) => {
-                    sendEmail(student, email)
-                    resolve(1)
+                    sendEmail(student, email).finally(() => resolve(1))
                 }).then(() => {})
                 state.studentEmailCount = index
             }
@@ -484,6 +495,8 @@ const addToHistory = async (student: any) => {
         const MON = filter.subject
         const DOT = filter.type
         const KHUVUC = filter.area
+        const COSO = filter.coso
+        const KHOI = filter.khoi
         return {
             SCORE,
             MADE,
@@ -493,6 +506,8 @@ const addToHistory = async (student: any) => {
             MON,
             DOT,
             KHUVUC,
+            COSO,
+            KHOI,
         }
     })
     await $fetch('/api/history/add', {
@@ -625,24 +640,21 @@ const sendEmailEarch = async () => {
                                         >{{ state.studentActive['SO BAO DANH'] }}</span
                                     >
 
-                                    <!-- <span
-                                        class="text-[#0071bc] font-bold absolute left-[90px] top-[93px] opacity-95"
-                                        v-if="
-                                            state.studentsInfo[
-                                                Number(state.studentActive['SO BAO DANH'])
-                                            ]?.['SCHOOL']
-                                        "
-                                        >{{
-                                            state.studentsInfo[
-                                                Number(state.studentActive['SO BAO DANH'])
-                                            ]?.['SCHOOL']
-                                        }}</span
-                                    > -->
-
                                     <span
                                         class="text-[#0071bc] font-bold absolute left-[645px] top-[60px] opacity-95"
                                     >
-                                        NQH Quận 10
+                                        <span
+                                            v-if="
+                                                state.studentsInfo[
+                                                    Number(state.studentActive['SO BAO DANH'])
+                                                ]?.['COSO']
+                                            "
+                                            >{{
+                                                state.studentsInfo[
+                                                    Number(state.studentActive['SO BAO DANH'])
+                                                ]?.['COSO']
+                                            }}</span
+                                        >
                                     </span>
                                     <p
                                         class="text-[#0071bc] font-bold absolute left-[95px] top-[94px] opacity-95"
@@ -692,7 +704,7 @@ const sendEmailEarch = async () => {
                                                     :href="item['Đường Dẫn']"
                                                     class="underline font-medium text-[#0071bc]"
                                                 >
-                                                    Con sai {{ item['Câu Hỏi'] }} => Con hãy làm
+                                                    Con sai {{ item['Dạng'] }} => Con hãy làm
                                                     {{ item['Giải pháp'] }}
                                                 </a>
                                             </li>
@@ -728,19 +740,36 @@ const sendEmailEarch = async () => {
                         class="block w-full border rounded-md border-gray-300 text-sm text-gray-4000 file:h-full h-8 file:rounded-s-md file:border-0 file:text-sm file:font-semibold file:bg-[#22c55e] file:text-white hover:file:bg-[#16a34a]"
                     />
                 </UFormGroup>
-                <UFormGroup label="Môn" name="subject" eager-validation required>
-                    <USelect
-                        v-model="filter.subject"
-                        :options="mon"
-                        placeholder="Lớp"
-                        class="w-40"
-                    />
-                </UFormGroup>
+
                 <UFormGroup label="Khu vực" name="area" eager-validation required>
                     <USelect
                         v-model="filter.area"
                         :options="khuvuc"
                         placeholder="Khu vực"
+                        class="w-40"
+                    />
+                </UFormGroup>
+                <UFormGroup label="Cơ sở" name="coso" eager-validation required>
+                    <USelect
+                        v-model="filter.coso"
+                        :options="coso"
+                        placeholder="Cơ sở"
+                        class="w-40"
+                    />
+                </UFormGroup>
+                <UFormGroup label="Khối" name="khoi" eager-validation required>
+                    <USelect
+                        v-model="filter.khoi"
+                        :options="[9, 12]"
+                        placeholder="Khối"
+                        class="w-40"
+                    />
+                </UFormGroup>
+                <UFormGroup label="Môn" name="subject" eager-validation required>
+                    <USelect
+                        v-model="filter.subject"
+                        :options="mon"
+                        placeholder="Môn"
                         class="w-40"
                     />
                 </UFormGroup>
@@ -752,11 +781,10 @@ const sendEmailEarch = async () => {
                         v-model="filter.type"
                     />
                 </UFormGroup>
-                <div class="flex flex-1 items-end justify-end">
-                    <UButton type="submit" class="h-fit mt-6" :loading="state.loading"
-                        >Kiểm tra và sửa bài</UButton
-                    >
-                </div>
+
+                <UButton type="submit" class="h-fit mt-6" :loading="state.loading"
+                    >Kiểm tra và sửa bài</UButton
+                >
             </UForm>
         </div>
         <div

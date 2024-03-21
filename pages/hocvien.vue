@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { khuvuc, thucchien } from '@/constants/options'
+import { coso, khuvuc, thucchien } from '@/constants/options'
 
 definePageMeta({
     layout: 'slot',
@@ -24,7 +24,7 @@ const columns = [
         key: 'EMAIL',
         label: 'Email',
         sortable: true,
-        class: 'w-[130px]',
+        class: 'w-[80px]',
     },
     {
         key: 'SCHOOL',
@@ -32,6 +32,31 @@ const columns = [
         sortable: true,
         class: 'w-[120px]',
     },
+    {
+        key: 'CLASS',
+        label: 'Lớp',
+        sortable: true,
+        class: 'w-[120px]',
+    },
+    {
+        key: 'KHOI',
+        label: 'Khối',
+        sortable: true,
+        class: 'w-[120px]',
+    },
+    {
+        key: 'COSO',
+        label: 'Cơ sở',
+        sortable: true,
+        class: 'w-[120px]',
+    },
+    {
+        key: 'AREA',
+        label: 'Khu vực',
+        sortable: true,
+        class: 'w-[120px]',
+    },
+
     {
         key: 'NQH',
         label: 'Đang học tại NQH',
@@ -66,12 +91,18 @@ const params = useRoute()
 const form = reactive({
     select: undefined,
     area: undefined,
+    coso: undefined,
+    khoi: undefined,
 })
 const formEdit = reactive({
     SBD: undefined,
     NAME: undefined,
     EMAIL: undefined,
     SCHOOL: undefined,
+    COSO: undefined,
+    KHOI: undefined,
+    AREA: undefined,
+    CLASS: undefined,
     NQH: 0,
 })
 const isEdit = ref(false)
@@ -79,13 +110,15 @@ const rows = computed(() => {
     const data = state.excercies?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
-const getByClass = (className?: string, area?: string) => {
+const getByClass = (className?: string, area?: string, coso?: string, khoi?: string) => {
     state.loading = true
     $fetch('/api/student/class', {
         method: 'POST',
         body: {
             CLASS: className,
             AREA: area,
+            COSO: coso,
+            KHOI: khoi,
         },
     })
         .then((data) => {
@@ -137,7 +170,8 @@ async function onUpdate(event: any) {
             toast.add({ title: 'Đã cập nhật', timeout: 3000 })
             isEdit.value = false
             Object.assign(formEdit, {})
-            getByClass(event.class)
+            console.log('event', event)
+            getByClass(event.data.CLASS, event.data.AERA, event.data.COSO, event.data.KHOI)
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
@@ -160,7 +194,7 @@ async function onDelete(SBD: any) {
             toast.add({ title: 'Đã xóa', timeout: 3000 })
             isEdit.value = false
             Object.assign(formEdit, {})
-            getByClass(form.select, form.area)
+            getByClass(form.select, form.area, form.coso, form.khoi)
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
@@ -181,6 +215,10 @@ const items = (row: any) => [
                     NAME: row['NAME'],
                     EMAIL: row['EMAIL'],
                     SCHOOL: row['SCHOOL'],
+                    COSO: row['COSO'],
+                    KHOI: row['KHOI'],
+                    CLASS: row['CLASS'],
+                    AREA: row['AREA'],
                     NQH: row['NQH'],
                 }
                 isEdit.value = true
@@ -203,13 +241,14 @@ const items = (row: any) => [
 watchEffect(() => {
     router.push({
         path: '/hocvien',
-        query: { select: form.select, area: form.area },
+        query: { select: form.select, area: form.area, coso: form.coso, khoi: form.khoi },
     })
 })
 
 watchEffect(() => {
     const search = params.query
-    if (search.select && search.area) getByClass(search.select, search.area)
+    if (search.select && search.area && search.coso && search.khoi)
+        getByClass(search.select, search.area, search.coso, search.khoi)
 })
 </script>
 
@@ -231,6 +270,18 @@ watchEffect(() => {
                         placeholder="Khu vực"
                         class="w-40"
                         v-model="form.area"
+                    />
+                    <USelect
+                        :options="coso"
+                        placeholder="Cơ sở"
+                        class="w-40"
+                        v-model="form.coso"
+                    />
+                    <USelect
+                        :options="['9', '12']"
+                        placeholder="Khối"
+                        class="w-40"
+                        v-model="form.khoi"
                     />
                     <USelect
                         :options="thucchien"
@@ -261,7 +312,7 @@ watchEffect(() => {
                 </template>
                 <template #actions-data="{ row }">
                     <UButton
-                        :to="`/lichsuthi/${row['AREA']}/${row['SBD']}`"
+                        :to="`/lichsuthi/${row['AREA']}/${row['COSO']}/${row['KHOI']}/${row['SBD']}`"
                         color="primary"
                         label="Xem lịch sử điểm"
                     />
@@ -293,7 +344,7 @@ watchEffect(() => {
                             <h3
                                 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
                             >
-                                Chỉnh sửa đáp án
+                                Chỉnh sửa học viên
                             </h3>
                             <UButton
                                 color="gray"
@@ -326,6 +377,62 @@ watchEffect(() => {
                                 <UTextarea
                                     v-model="formEdit.NAME"
                                     placeholder="Nhập tên học sinh."
+                                />
+                            </UFormGroup>
+                            <UFormGroup
+                                label="Khu vực"
+                                name="AREA"
+                                eager-validation
+                                required
+                                class="w-full"
+                            >
+                                <USelect
+                                    :options="khuvuc"
+                                    placeholder="Khu vực"
+                                    class="w-full"
+                                    v-model="formEdit.AREA"
+                                />
+                            </UFormGroup>
+                            <UFormGroup
+                                label="Cơ sở"
+                                name="COSO"
+                                eager-validation
+                                required
+                                class="w-full"
+                            >
+                                <USelect
+                                    :options="coso"
+                                    placeholder="Cơ sở"
+                                    class="w-full"
+                                    v-model="formEdit.COSO"
+                                />
+                            </UFormGroup>
+                            <UFormGroup
+                                label="Khối"
+                                name="KHOI"
+                                eager-validation
+                                required
+                                class="w-full"
+                            >
+                                <USelect
+                                    :options="[9, 12]"
+                                    placeholder="Khối"
+                                    class="w-full"
+                                    v-model="formEdit.KHOI"
+                                />
+                            </UFormGroup>
+                            <UFormGroup
+                                label="Lớp"
+                                name="CLASS"
+                                eager-validation
+                                required
+                                class="w-full"
+                            >
+                                <USelect
+                                    :options="thucchien"
+                                    placeholder="Lớp"
+                                    class="w-full"
+                                    v-model="formEdit.CLASS"
                                 />
                             </UFormGroup>
                             <UFormGroup

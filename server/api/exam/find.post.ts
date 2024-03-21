@@ -5,7 +5,9 @@ export default defineEventHandler(async (event) => {
     const code = payload.code
     const type = payload.type
     const subject = payload.subject
-    const exam = await Exam.find({ code: { $in: code }, type, subject })
+    const khoi = payload.khoi
+
+    const exam = await Exam.find({ code: { $in: code }, type, khoi: khoi })
 
     if (exam.length == 0) {
         return setResponseStatus(event, 404, 'Not Found')

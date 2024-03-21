@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { thucchien, khuvuc } from '@/constants/options'
+import { thucchien, khuvuc, coso } from '@/constants/options'
 import { z } from 'zod'
 
 definePageMeta({
@@ -46,6 +46,8 @@ const state = reactive({
     code: undefined,
     class: undefined,
     area: undefined,
+    coso: undefined,
+    khoi: undefined,
     types: undefined,
     file: undefined,
     loading: false,
@@ -59,6 +61,12 @@ const schema = z.object({
     }),
     area: z.string({
         required_error: 'Vui lòng chọn khu vực',
+    }),
+    coso: z.string({
+        required_error: 'Vui lòng chọn cơ sở',
+    }),
+    khoi: z.string({
+        required_error: 'Vui lòng chọn khối',
     }),
 })
 
@@ -95,7 +103,13 @@ async function onSubmit(event: any) {
     state.loading = true
     const dataCreate = state.students
         .filter((item: any) => item.SBD)
-        .map((student: any) => ({ ...student, CLASS: state.class, AREA: state.area }))
+      .map((student: any) => ({
+        ...student,
+        CLASS: state.class,
+        AREA: state.area,
+        KHOI: state.khoi,
+        COSO: state.coso,
+      }))
 
     $fetch('/api/student/add', {
         method: 'POST',
@@ -156,6 +170,24 @@ async function onSubmit(event: any) {
                         placeholder="Khu vực"
                         class="w-40"
                         v-model="state.area"
+                    />
+                </UFormGroup>
+
+                <UFormGroup label="Cơ sở đăng ký" name="coso" eager-validation required>
+                    <USelect
+                        :options="coso"
+                        placeholder="Cơ sở"
+                        class="w-40"
+                        v-model="state.coso"
+                    />
+                </UFormGroup>
+
+                <UFormGroup label="Khối đăng ký" name="khoi" eager-validation required>
+                    <USelect
+                        :options="[9, 12]"
+                        placeholder="Khối"
+                        class="w-40"
+                        v-model="state.khoi"
                     />
                 </UFormGroup>
                 <UFormGroup label="Lớp đăng ký" name="class" eager-validation required>

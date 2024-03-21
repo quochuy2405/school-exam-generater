@@ -6,9 +6,21 @@ export default defineEventHandler(async (event) => {
     const newExam = {
         code: payload.code,
         excercies: payload.excercies,
+        type: payload.type,
+        subject: payload.subject,
+        khoi: payload.khoi,
+        score: payload.score,
     }
     try {
-        await Exam.updateOne({ code: newExam.code }, { $set: newExam })
+        await Exam.updateOne(
+            {
+                code: payload.code,
+                type: payload.type,
+                subject: payload.subject,
+                khoi: payload.khoi,
+            },
+            { $set: newExam }
+        )
         return newExam
     } catch (error) {
         console.log('error', error)

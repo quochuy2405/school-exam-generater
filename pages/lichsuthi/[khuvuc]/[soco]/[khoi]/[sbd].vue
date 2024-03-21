@@ -76,6 +76,8 @@ const loadHistory = () => {
         body: {
             SBD: router.params.sbd,
             KHUVUC: router.params.khuvuc,
+            COSO: router.params.coso,
+            KHOI: router.params.khoi,
         },
     })
         .then((data) => {

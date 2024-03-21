@@ -5,6 +5,7 @@ const ExamSchema = new Schema({
     excercies: Object,
     type: String,
     subject: String,
+    khoi: String,
     score: Number,
 })
 

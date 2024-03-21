@@ -15,12 +15,6 @@ const columns = [
         class: 'w-[60px]',
     },
     {
-        key: 'Câu Hỏi',
-        label: 'Câu Hỏi',
-        sortable: true,
-        class: 'min-w-[100px]',
-    },
-    {
         key: 'Dạng',
         label: 'Dạng',
         sortable: true,
@@ -54,11 +48,11 @@ const items = (row: any) => [
             icon: 'i-heroicons-pencil-square-20-solid',
             click: () => {
                 const editData = {
-                    question: row['Câu Hỏi'],
                     type: row['Dạng'],
                     solve: row['Giải pháp'],
                     answer: row['Đáp Án'],
                     link: row['Đường Dẫn'],
+                    score: row['Điểm'],
                     stt: row['STT'],
                 }
 
@@ -84,7 +78,6 @@ const formEdit = reactive({
     stt: undefined,
     type: undefined,
     solve: undefined,
-    question: undefined,
     link: undefined,
     score: undefined,
 })
@@ -102,6 +95,7 @@ watchEffect(() => {
     const body = {
         code: router.params.id,
         type: router.params.type,
+        khoi: router.params.khoi,
         subject: router.params.slug,
     }
 
@@ -131,7 +125,6 @@ async function onUpdate(event: any) {
         'Đáp Án': event.data.answer,
         Dạng: event.data.type,
         'Giải pháp': event.data.solve,
-        'Câu Hỏi': event.data.question,
         'Đường Dẫn': event.data.link,
         Điểm: event.data.score,
     }
@@ -158,6 +151,7 @@ async function onDelete(event: any) {
     const body = {
         code: router.params.id,
         type: router.params.type,
+        khoi: router.params.khoi,
         subject: router.params.slug,
     }
 
@@ -176,25 +170,28 @@ async function onDelete(event: any) {
 
 <template>
     <div class="flex h-full flex-col gap-3 w-full overflow-auto px-2 py-1">
-        <UCard class="flex justify-end">
-            <UPopover>
-                <UButton color="red" class="h-fit w-fit px-2" :loading="state.loading"
-                    >Xóa bộ đề này</UButton
-                >
-                <template #panel>
-                    <div class="p-4 flex justify-end flex-col items-end gap-2">
-                        <UCard>Bạn có xác muốn xóa</UCard>
-                        <UButton
-                            @click="onDelete"
-                            color="red"
-                            class="h-fit w-fit px-2"
-                            :loading="state.loading"
-                            >Xóa</UButton
-                        >
-                    </div>
-                </template>
-            </UPopover>
-        </UCard>
+        <div class="flex w-full py-5 bg-white border rounded-lg px-2">
+            <div class="flex w-full justify-between gap-5">
+                <UButton :to="`/quanlydapan/${router.params.slug}`" color="black">Quay lại</UButton>
+                <UPopover>
+                    <UButton color="red" class="h-fit w-fit px-2" :loading="state.loading"
+                        >Xóa bộ đề này</UButton
+                    >
+                    <template #panel>
+                        <div class="p-4 flex justify-end flex-col items-end gap-2">
+                            <UCard>Bạn có xác muốn xóa</UCard>
+                            <UButton
+                                @click="onDelete"
+                                color="red"
+                                class="h-fit w-fit px-2"
+                                :loading="state.loading"
+                                >Xóa</UButton
+                            >
+                        </div>
+                    </template>
+                </UPopover>
+            </div>
+        </div>
 
         <div
             class="w-full flex-1 flex flex-col h-full bg-white rounded-md shadow-sm border overflow-hidden"
@@ -264,13 +261,13 @@ async function onDelete(event: any) {
                             <UInput v-model="formEdit.stt" placeholder="STT" :disabled="true" />
                         </UFormGroup>
                         <UFormGroup
-                            label="Câu hỏi"
+                            label="Dạng"
                             name="question"
                             eager-validation
                             required
                             class="w-full"
                         >
-                            <UTextarea v-model="formEdit.question" placeholder="Nhập câu hỏi..." />
+                            <UTextarea v-model="formEdit.type" placeholder="Nhập dạng câu hỏi..." />
                         </UFormGroup>
                         <UFormGroup
                             label="Đáp án"

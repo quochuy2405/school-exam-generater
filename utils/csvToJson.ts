@@ -71,7 +71,8 @@ export const generateContent = (
     mark: string,
     subject: string,
     school: string,
-    isNQH: boolean
+    isNQH: boolean,
+    coso: string
 ) => {
     const ol = anwers?.map((item) => ({
         text: `Con sai ${item.question} (Bấm để làm BT tương tự)`,
@@ -105,7 +106,7 @@ export const generateContent = (
                         absolutePosition: { x: 290, y: 47 },
                     },
                     {
-                        text: 'NQH Quận 10',
+                        text: coso || '',
                         bold: true,
                         alignment: 'left',
                         fontSize: 12,
