@@ -170,8 +170,8 @@ async function onUpdate(event: any) {
             toast.add({ title: 'Đã cập nhật', timeout: 3000 })
             isEdit.value = false
             Object.assign(formEdit, {})
-            console.log('event', event)
-            getByClass(event.data.CLASS, event.data.AERA, event.data.COSO, event.data.KHOI)
+            const search = params.query
+            getByClass(search.lop, search.area, search.coso, search.khoi)
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
