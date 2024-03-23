@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { thucchien, khuvuc, coso } from '@/constants/options'
+import { thucchien, khuvuc, coso, mon } from '@/constants/options'
 import { z } from 'zod'
 
 definePageMeta({
@@ -48,6 +48,7 @@ const state = reactive({
     area: undefined,
     coso: undefined,
     khoi: undefined,
+    mon: undefined,
     types: undefined,
     file: undefined,
     loading: false,
@@ -67,6 +68,9 @@ const schema = z.object({
     }),
     khoi: z.string({
         required_error: 'Vui lòng chọn khối',
+    }),
+    mon: z.string({
+        required_error: 'Vui lòng chọn môn',
     }),
 })
 
@@ -103,13 +107,14 @@ async function onSubmit(event: any) {
     state.loading = true
     const dataCreate = state.students
         .filter((item: any) => item.SBD)
-      .map((student: any) => ({
-        ...student,
-        CLASS: state.class,
-        AREA: state.area,
-        KHOI: state.khoi,
-        COSO: state.coso,
-      }))
+        .map((student: any) => ({
+            ...student,
+            CLASS: state.class,
+            AREA: state.area,
+            KHOI: state.khoi,
+            COSO: state.coso,
+            MON: state.mon,
+        }))
 
     $fetch('/api/student/add', {
         method: 'POST',
@@ -151,7 +156,7 @@ async function onSubmit(event: any) {
             :state="state"
             :schema="schema"
             @submit="onSubmit"
-            class="flex justify-between gap-6 items-end"
+            class="flex flex-col justify-start gap-6 items-start"
         >
             <div class="flex justify-start gap-6 items-end">
                 <UFormGroup label="Tải lên file csv" name="file" class="w-fit" eager-validation>
@@ -181,7 +186,8 @@ async function onSubmit(event: any) {
                         v-model="state.coso"
                     />
                 </UFormGroup>
-
+            </div>
+            <div class="flex gap-4">
                 <UFormGroup label="Khối đăng ký" name="khoi" eager-validation required>
                     <USelect
                         :options="[9, 12]"
@@ -198,11 +204,14 @@ async function onSubmit(event: any) {
                         v-model="state.class"
                     />
                 </UFormGroup>
-            </div>
 
-            <UButton :loading="state.loading" type="submit" class="h-fit"
-                >Thêm tất cả học sinh</UButton
-            >
+                <UFormGroup label="Môn đăng ký" name="mon" eager-validation required>
+                    <USelect :options="mon" placeholder="Môn" class="w-40" v-model="state.mon" />
+                </UFormGroup>
+                <UButton :loading="state.loading" type="submit" class="h-fit mt-6"
+                    >Thêm tất cả học sinh</UButton
+                >
+            </div>
         </UForm>
         <div
             class="w-full flex-1 flex flex-col h-full bg-white rounded-md shadow-sm border overflow-hidden"

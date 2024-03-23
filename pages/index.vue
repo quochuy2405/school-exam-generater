@@ -34,11 +34,11 @@ const state = reactive({
     },
 })
 const filter = reactive({
-    subject: '',
-    type: '',
-    khoi: '',
-    coso: '',
-    area: '',
+    mon: undefined,
+    type: undefined,
+    khoi: undefined,
+    coso: undefined,
+    area: undefined,
 })
 const page = ref(1)
 const pageCount = 10
@@ -49,7 +49,7 @@ const rows = computed(() => {
 })
 
 const schema = z.object({
-    subject: z.string({
+    mon: z.string({
         required_error: 'Vui lòng chọn môn học',
     }),
     type: z.string({
@@ -58,20 +58,13 @@ const schema = z.object({
     area: z.string({
         required_error: 'Vui lòng chọn khu vực',
     }),
+    khoi: z.string({
+        required_error: 'Vui lòng chọn khối',
+    }),
+    coso: z.string({
+        required_error: 'Vui lòng chọn cơ sở',
+    }),
 })
-const validate = (state: any): any[] => {
-    const errors = []
-    if (!state.subject) {
-        errors.push({ path: 'subject', message: 'Vui lòng chọn môn.' })
-    }
-    if (!state.type) {
-        errors.push({ path: 'type', message: 'Vui lòng chọn số thực chiến.' })
-    }
-    if (!state.area) {
-        errors.push({ path: 'area', message: 'Vui lòng chọn khu vực.' })
-    }
-    return errors
-}
 
 const handleChangeFile = (event: any) => {
     if (intervalTime) clearInterval(intervalTime)
@@ -137,12 +130,12 @@ const onPdfByStudent = async (student: any, download = false) => {
         student,
         answer,
         mark,
-        filter.subject,
+        filter.mon || '',
         state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['SCHOOL'],
         !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH'],
         state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['COSO']
     )
-    const filename = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.subject}.pdf`
+    const filename = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.mon}.pdf`
     if (download) {
         pdfMaker.createPdf(JSON.parse(JSON.stringify(content))).getBlob((blob: any) => {
             const url = URL.createObjectURL(blob)
@@ -210,17 +203,20 @@ async function onSubmit() {
         return
     }
     state.loading = true
-    const subjectConvert: any = {
+    const monConvert: any = {
         Toán: 'toan',
         Lý: 'ly',
         Hóa: 'hoa',
         Anh: 'anh',
+        Văn: 'van',
+        Sinh: 'sinh',
+        ĐGNL: 'dgnl',
     }
 
     const body = {
         code: codesUnique,
         type: filter.type,
-        subject: subjectConvert[filter.subject],
+        mon: monConvert[filter.mon || ''],
         coso: filter.coso,
         khoi: filter.khoi,
     }
@@ -238,6 +234,7 @@ async function onSubmit() {
                         coso: filter.coso,
                         area: filter.area,
                         khoi: filter.khoi,
+                        mon: filter.mon,
                     },
                 })
                     .then((studentsInfo) => {
@@ -253,7 +250,7 @@ async function onSubmit() {
                         toast.add({
                             title: 'Không tìm thấy thông tin học sinh',
                             description: 'Vui lòng kiểm tra lại các ô lựa chọn',
-                            timeout: 3000,
+                            timeout: 8000,
                             icon: 'i-heroicons-exclamation-triangle',
                             color: 'orange',
                         })
@@ -291,7 +288,7 @@ async function sendEmail(student: any, email: string) {
             const data: any = {
                 name: student['HO VA TEN'],
                 email: email,
-                subject: filter.subject,
+                mon: filter.mon,
                 diem: onMarkStudent(student).mark,
                 sbd: student['SO BAO DANH'],
             }
@@ -304,7 +301,7 @@ async function sendEmail(student: any, email: string) {
             const form = new FormData()
             form.append('name', data.name)
             form.append('email', data.email)
-            form.append('subject', data.subject)
+            form.append('mon', data.mon)
             form.append('sbd', data.sbd)
             form.append('diem', data.diem)
             form.append('pdf', pdf)
@@ -339,33 +336,6 @@ async function sendEmail(student: any, email: string) {
                         icon: 'i-heroicons-exclamation-triangle',
                         color: 'orange',
                     })
-                    $fetch('/api/bin/add', {
-                        method: 'POST',
-                        body: {
-                            student: {
-                                ...student,
-                                type: filter.type,
-                                area: filter.area,
-                                subject: filter.subject,
-                            },
-                        },
-                    })
-                        .then(() => {
-                            toast.add({
-                                title: 'Đã backup dữ liệu ' + data.name,
-                                timeout: 3000,
-                                icon: 'i-heroicons-exclamation-triangle',
-                            })
-                        })
-                        .catch(() => {
-                            toast.add({
-                                title: 'Không thể backup dữ liệu ' + data.name,
-                                description: 'Vui lòng tải file pdf xuống để tránh mất dữ liệu.',
-                                timeout: 3000,
-                                icon: 'i-heroicons-exclamation-triangle',
-                                color: 'red',
-                            })
-                        })
                 })
                 .finally(() => {
                     state.loading = false
@@ -383,6 +353,43 @@ async function sendEmail(student: any, email: string) {
         })
         return 0
     }
+}
+
+const addStudentToBin = () => {
+    const body = state.excercies
+        .filter((item: any) => !state.emailList.success.includes(item['SO BAO DANH']))
+        .map((item: any) => {
+            return {
+                SOBAODANH: item['SO BAO DANH'],
+                HOVATEN: item['HOVARTEN'],
+                DAPAN: item,
+                COSO: filter.coso,
+                AREA: filter.area,
+                KHOI: filter.khoi,
+                MON: filter.mon,
+                THUCCHIEN: filter.type,
+            }
+        })
+    $fetch('/api/bin/add', {
+        method: 'POST',
+        body,
+    })
+        .then(() => {
+            toast.add({
+                title: 'Đã backup dữ liệu ',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+            })
+        })
+        .catch(() => {
+            toast.add({
+                title: 'Không thể backup dữ liệu ',
+                description: 'Vui lòng tải file pdf xuống để tránh mất dữ liệu.',
+                timeout: 3000,
+                icon: 'i-heroicons-exclamation-triangle',
+                color: 'red',
+            })
+        })
 }
 
 const downloadAll = async () => {
@@ -425,7 +432,7 @@ const downloadAll = async () => {
                 student,
                 resolve,
                 mark,
-                filter.subject,
+                filter.mon || '',
                 state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['SCHOOL'],
                 !!state?.studentsInfo?.[Number(student?.['SO BAO DANH'])]?.['NQH'],
                 state?.studentsInfo?.[Number(student['SO BAO DANH'])]?.['COSO']
@@ -434,7 +441,7 @@ const downloadAll = async () => {
             const pdfDocGenerator = pdfMaker.createPdf(JSON.parse(JSON.stringify(content)))
 
             pdfDocGenerator.getBlob(async (blob: string) => {
-                const name = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.subject}.pdf`
+                const name = `${student['HO VA TEN']}-${student['SO BAO DANH']}-${filter.mon}.pdf`
 
                 state.zips.push({ name: toNonAccentVietnamese(name), blob })
             })
@@ -492,7 +499,7 @@ const addToHistory = async (student: any) => {
         const NAME = st.value['HO VA TEN']
         const SBD = st.value['SO BAO DANH']
         const NGAY = today
-        const MON = filter.subject
+        const MON = filter.mon
         const DOT = filter.type
         const KHUVUC = filter.area
         const COSO = filter.coso
@@ -621,6 +628,12 @@ const sendEmailEarch = async () => {
                                     <UButton class="w-fit" @click="sendEmailEarch"
                                         >Gửi kết lời giải qua từng Email</UButton
                                     >
+                                    <UButton
+                                        class="w-fit"
+                                        :disabled="!state.emailList.success.length"
+                                        @click="addStudentToBin"
+                                        >Lưu kết quả học sinh lỗi email</UButton
+                                    >
                                 </div>
 
                                 <div
@@ -676,7 +689,7 @@ const sendEmailEarch = async () => {
                                         class="text-[#0071bc] font-bold absolute left-[365px] top-[94px] opacity-95"
                                     >
                                         <span>
-                                            {{ filter.subject }}
+                                            {{ filter.mon }}
                                         </span>
                                     </p>
                                     <p
@@ -720,9 +733,8 @@ const sendEmailEarch = async () => {
 
         <div class="flex justify-between items-end flex-wrap">
             <UForm
-                :validate="validate"
-                :schema="schema"
                 :state="filter"
+                :schema="schema"
                 @submit="onSubmit"
                 class="flex gap-3 flex-wrap items-start"
             >
@@ -765,13 +777,8 @@ const sendEmailEarch = async () => {
                         class="w-40"
                     />
                 </UFormGroup>
-                <UFormGroup label="Môn" name="subject" eager-validation required>
-                    <USelect
-                        v-model="filter.subject"
-                        :options="mon"
-                        placeholder="Môn"
-                        class="w-40"
-                    />
+                <UFormGroup label="Môn" name="mon" eager-validation required>
+                    <USelect v-model="filter.mon" :options="mon" placeholder="Môn" class="w-40" />
                 </UFormGroup>
                 <UFormGroup label="Số thực chiến" name="type" eager-validation required>
                     <USelect

@@ -12,6 +12,7 @@ const StudentSchema = new Schema({
     AREA: String,
     COSO: String,
     KHOI: String,
+    MON: String,
 })
 
 export const Student = model('Student', StudentSchema)

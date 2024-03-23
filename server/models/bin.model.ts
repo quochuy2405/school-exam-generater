@@ -1,7 +1,14 @@
 import { Schema, model } from 'mongoose'
 
 const BinSchema = new Schema({
-    student: Object,
+    SOBAODANH: String,
+    HOVATEN: String,
+    DAPAN: Object,
+    COSO: String,
+    AREA: String,
+    KHOI: String,
+    MON: String,
+    THUCCHIEN: String,
 })
 
 export const Bin = model('Bin', BinSchema)

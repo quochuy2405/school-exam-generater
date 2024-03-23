@@ -1,6 +1,6 @@
 export const thucchien = ['TC1', 'TC2', 'TC3']
 export const khuvuc = ['Tây Bắc', 'TPBX10', '5611BT']
-export const mon = ['Toán', 'Lý', 'Hóa', 'Anh']
+export const mon = ['Toán', 'Lý', 'Hóa', 'Văn', 'Anh', 'Sinh ', 'ĐGNL']
 export const coso = [
     'Tân Phú',
     'Cầu Xéo',

@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
     const coso = payload.coso
     const khoi = payload.khoi
     const type = payload.type
+    const mon = payload.mon
 
     const students = await Student.find({
         SBD: { $in: codes },
@@ -14,6 +15,7 @@ export default defineEventHandler(async (event) => {
         COSO: coso,
         KHOI: khoi,
         CLASS: type,
+        MON: mon,
     })
     if (students.length == 0) {
         return setResponseStatus(event, 404, 'Not Found')

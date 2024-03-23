@@ -6,7 +6,16 @@ export default defineEventHandler(async (event) => {
         ...payload,
     }
     try {
-        await Student.updateOne({ SBD: dataUpdate.SBD }, { $set: dataUpdate })
+        await Student.updateOne(
+            {
+                SBD: dataUpdate.SBD,
+                CLASS: dataUpdate.CLASS,
+                MON: dataUpdate.MON,
+                KHOI: dataUpdate.KHOI,
+                AREA: dataUpdate.AREA,
+            },
+            { $set: dataUpdate }
+        )
         return dataUpdate
     } catch (error) {
         console.log('error', error)

@@ -9,7 +9,7 @@ import { ItemNav } from '../atoms'
             alt=""
             class="w-[140px] m-auto"
         />
-        <div class="mt-5 flex flex-col gap-3">
+        <div class="mt-5 flex flex-col gap-3 overflow-y-auto h-[80vh] no-scrollbar">
             <h3 class="font-normal text-gray-600 text-xs">MAIN MENU</h3>
             <div class="flex flex-col gap-2">
                 <ItemNav href="/" name="Chấm chữa bài" />
@@ -22,6 +22,9 @@ import { ItemNav } from '../atoms'
             <ItemNav href="/quanlydapan/ly" name="Môn Lý" />
             <ItemNav href="/quanlydapan/hoa" name="Môn Hóa" />
             <ItemNav href="/quanlydapan/anh" name="Môn Anh" />
+            <ItemNav href="/quanlydapan/van" name="Môn Văn" />
+            <ItemNav href="/quanlydapan/sinh" name="Môn Sinh" />
+            <ItemNav href="/quanlydapan/dgnl" name="Đánh giá năng lực(ĐGNL)" />
             <!-- <ItemNav href="/quanlydapan/danhgia" name="Đánh giá năng lực" /> -->
         </div>
     </UCard>

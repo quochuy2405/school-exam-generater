@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import '@/assets/css/hidden-scroll.css'
 import { NavBar } from '@/components/organisms'
 </script>
 <template>

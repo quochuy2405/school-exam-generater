@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { coso, khuvuc, thucchien } from '@/constants/options'
+import { coso, khuvuc, mon, thucchien } from '@/constants/options'
 
 definePageMeta({
     layout: 'slot',
@@ -93,6 +93,7 @@ const form = reactive({
     area: undefined,
     coso: undefined,
     khoi: undefined,
+    mon: undefined,
 })
 const formEdit = reactive({
     SBD: undefined,
@@ -102,6 +103,7 @@ const formEdit = reactive({
     COSO: undefined,
     KHOI: undefined,
     AREA: undefined,
+    MON: undefined,
     CLASS: undefined,
     NQH: 0,
 })
@@ -110,7 +112,7 @@ const rows = computed(() => {
     const data = state.excercies?.slice((page.value - 1) * pageCount, page.value * pageCount)
     return data
 })
-const getByClass = (lop?: string, area?: string, coso?: string, khoi?: string) => {
+const getByClass = (lop?: string, area?: string, coso?: string, khoi?: string, mon?: string) => {
     state.loading = true
     $fetch('/api/student/class', {
         method: 'POST',
@@ -119,6 +121,7 @@ const getByClass = (lop?: string, area?: string, coso?: string, khoi?: string) =
             AREA: area,
             COSO: coso,
             KHOI: khoi,
+            MON: mon,
         },
     })
         .then((data) => {
@@ -171,7 +174,7 @@ async function onUpdate(event: any) {
             isEdit.value = false
             Object.assign(formEdit, {})
             const search = params.query
-            getByClass(search.lop, search.area, search.coso, search.khoi)
+            getByClass(search.lop, search.area, search.coso, search.khoi, search.mon)
         })
         .catch(() => {
             toast.add({ title: 'Không tìm thấy', timeout: 3000 })
@@ -218,6 +221,7 @@ const items = (row: any) => [
                     COSO: row['COSO'],
                     KHOI: row['KHOI'],
                     CLASS: row['CLASS'],
+                    MON: row['MON'],
                     AREA: row['AREA'],
                     NQH: row['NQH'],
                 }
@@ -244,6 +248,7 @@ watchEffect(() => {
         area: form.area || search.area,
         coso: form.coso || search.coso,
         khoi: form.khoi || search.khoi,
+        mon: form.mon || search.mon,
     }
 
     Object.assign(form, { ...data })
@@ -253,8 +258,8 @@ watchEffect(() => {
         query: data,
     })
 
-    if (search.lop && search.area && search.coso && search.khoi)
-        getByClass(search.lop, search.area, search.coso, search.khoi)
+    if (search.lop && search.area && search.coso && search.khoi && search.mon)
+        getByClass(search.lop, search.area, search.coso, search.khoi, search.mon)
 })
 </script>
 
@@ -289,6 +294,12 @@ watchEffect(() => {
                         placeholder="Lớp"
                         class="w-40"
                         v-model="form.lop"
+                    />
+                      <USelect
+                        :options="mon"
+                        placeholder="Môn"
+                        class="w-40"
+                        v-model="form.mon"
                     />
                 </div>
             </div>
