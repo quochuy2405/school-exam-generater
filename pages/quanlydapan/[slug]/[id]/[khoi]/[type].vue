@@ -291,7 +291,7 @@ async function onDelete(event: any) {
                         >
                             <UTextarea
                                 v-model="formEdit.solve"
-                                placeholder="Nhập lời giai gợi ý..."
+                                placeholder="Nhập lời giải gợi ý..."
                             />
                         </UFormGroup>
                         <UFormGroup

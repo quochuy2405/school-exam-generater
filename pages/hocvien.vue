@@ -445,7 +445,7 @@ watchEffect(() => {
                                 <UInput v-model="formEdit.SCHOOL" placeholder="Trường học" />
                             </UFormGroup>
                             <UFormGroup
-                                label="EMAIL"
+                                label="Email"
                                 name="EMAIL"
                                 eager-validation
                                 required
@@ -453,7 +453,7 @@ watchEffect(() => {
                             >
                                 <UTextarea
                                     v-model="formEdit.EMAIL"
-                                    placeholder="Nhập lời giai gợi ý..."
+                                    placeholder="Nhập email học viên."
                                 />
                             </UFormGroup>
                             <UFormGroup
