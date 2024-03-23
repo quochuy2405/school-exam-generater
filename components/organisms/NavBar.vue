@@ -15,6 +15,7 @@ import { ItemNav } from '../atoms'
                 <ItemNav href="/" name="Chấm chữa bài" />
 
                 <ItemNav href="/hocvien" name="Danh sách học viên" />
+                <ItemNav href="/quanlylop" name="Danh sách lớp" />
             </div>
             <h3 class="font-normal text-gray-600 text-xs">QUẢN LÝ ĐÁP ÁN</h3>
             <ItemNav href="/quanlydapan/toan" name="Môn Toán" />

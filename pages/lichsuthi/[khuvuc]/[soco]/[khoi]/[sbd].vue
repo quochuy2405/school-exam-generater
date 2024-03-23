@@ -66,8 +66,7 @@ const rows = computed(() => {
     return data
 })
 const linkBack = computed(() => {
-  const link = `/hocvien?area='${router.params.khuvuc}'&select='${rows.value?.[0]?.['DOT']}'`
-    console.log('link', link)
+  const link = `/hocvien?area='${router.params.khuvuc}'&lop='${rows.value?.[0]?.['DOT']}'`
     return link
 })
 const loadHistory = () => {
