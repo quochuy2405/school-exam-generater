@@ -780,10 +780,10 @@ const sendEmailEarch = async () => {
                 <UFormGroup label="Môn" name="mon" eager-validation required>
                     <USelect v-model="filter.mon" :options="mon" placeholder="Môn" class="w-40" />
                 </UFormGroup>
-                <UFormGroup label="Số thực chiến" name="type" eager-validation required>
+                <UFormGroup label="Lớp" name="type" eager-validation required>
                     <USelect
                         :options="thucchien"
-                        placeholder="Số thực chiến"
+                        placeholder="Lớp"
                         class="w-40"
                         v-model="filter.type"
                     />
