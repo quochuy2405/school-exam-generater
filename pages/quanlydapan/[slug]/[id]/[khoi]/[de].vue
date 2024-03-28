@@ -48,7 +48,7 @@ const items = (row: any) => [
             icon: 'i-heroicons-pencil-square-20-solid',
             click: () => {
                 const editData = {
-                    type: row['Dạng'],
+                    de: row['Dạng'],
                     solve: row['Giải pháp'],
                     answer: row['Đáp Án'],
                     link: row['Đường Dẫn'],
@@ -70,13 +70,13 @@ const navigation = useRouter()
 const state = reactive({
     code: undefined,
     loading: false,
-    type: undefined,
+    de: undefined,
     excercies: [] as any,
 })
 const formEdit = reactive({
     answer: undefined,
     stt: undefined,
-    type: undefined,
+    de: undefined,
     solve: undefined,
     link: undefined,
     score: undefined,
@@ -94,9 +94,9 @@ watchEffect(() => {
     state.loading = true
     const body = {
         code: router.params.id,
-        type: router.params.type,
+        de: router.params.de,
         khoi: router.params.khoi,
-        subject: router.params.slug,
+        mon: router.params.slug,
     }
 
     $fetch('/api/exam/find', { method: 'POST', body })
@@ -123,7 +123,7 @@ async function onUpdate(event: any) {
 
     const body = {
         'Đáp Án': event.data.answer,
-        Dạng: event.data.type,
+        Dạng: event.data.de,
         'Giải pháp': event.data.solve,
         'Đường Dẫn': event.data.link,
         Điểm: event.data.score,
@@ -150,9 +150,9 @@ async function onDelete(event: any) {
 
     const body = {
         code: router.params.id,
-        type: router.params.type,
+        de: router.params.de,
         khoi: router.params.khoi,
-        subject: router.params.slug,
+        mon: router.params.slug,
     }
 
     $fetch('/api/exam/delete', { method: 'POST', body })
@@ -267,7 +267,7 @@ async function onDelete(event: any) {
                             required
                             class="w-full"
                         >
-                            <UTextarea v-model="formEdit.type" placeholder="Nhập dạng câu hỏi..." />
+                            <UTextarea v-model="formEdit.de" placeholder="Nhập dạng câu hỏi..." />
                         </UFormGroup>
                         <UFormGroup
                             label="Đáp án"
@@ -315,7 +315,7 @@ async function onDelete(event: any) {
                         >
                             <UInput v-model="formEdit.score" placeholder="Nhập điểm từng câu" />
                         </UFormGroup>
-                        <UButton type="submit">Lưu đáp án</UButton>
+                        <UButton de="submit">Lưu đáp án</UButton>
                     </div>
                 </UForm>
             </UCard>

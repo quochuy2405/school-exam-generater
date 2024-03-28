@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const area = payload.area
     const coso = payload.coso
     const khoi = payload.khoi
-    const type = payload.type
+    const lop = payload.lop
     const mon = payload.mon
 
     const students = await Student.find({
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         AREA: area,
         COSO: coso,
         KHOI: khoi,
-        CLASS: type,
+        CLASS: lop,
         MON: mon,
     })
     if (students.length == 0) {

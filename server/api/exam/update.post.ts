@@ -6,8 +6,8 @@ export default defineEventHandler(async (event) => {
     const newExam = {
         code: payload.code,
         excercies: payload.excercies,
-        type: payload.type,
-        subject: payload.subject,
+        de: payload.de,
+        mon: payload.mon,
         khoi: payload.khoi,
         score: payload.score,
     }
@@ -15,8 +15,8 @@ export default defineEventHandler(async (event) => {
         await Exam.updateOne(
             {
                 code: payload.code,
-                type: payload.type,
-                subject: payload.subject,
+                de: payload.de,
+                mon: payload.mon,
                 khoi: payload.khoi,
             },
             { $set: newExam }

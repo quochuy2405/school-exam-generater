@@ -35,10 +35,11 @@ const state = reactive({
 })
 const filter = reactive({
     mon: undefined,
-    type: undefined,
+    lop: undefined,
     khoi: undefined,
     coso: undefined,
     area: undefined,
+    de: undefined,
 })
 const page = ref(1)
 const pageCount = 10
@@ -52,7 +53,7 @@ const schema = z.object({
     mon: z.string({
         required_error: 'Vui lòng chọn môn học',
     }),
-    type: z.string({
+    lop: z.string({
         required_error: 'Vui lòng chọn lớp thực chiến',
     }),
     area: z.string({
@@ -63,6 +64,9 @@ const schema = z.object({
     }),
     coso: z.string({
         required_error: 'Vui lòng chọn cơ sở',
+    }),
+    de: z.string({
+        required_error: 'Vui lòng nhập mã đề thực chiến',
     }),
 })
 
@@ -215,11 +219,11 @@ async function onSubmit() {
 
     const body = {
         code: codesUnique,
-        type: filter.type,
         mon: monConvert[filter.mon || ''],
         coso: filter.coso,
         khoi: filter.khoi,
-    }
+        de: filter.de,
+  }
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
             if (response.length) {
@@ -230,7 +234,7 @@ async function onSubmit() {
                     method: 'POST',
                     body: {
                         codes,
-                        type: filter.type,
+                        lop: filter.lop,
                         coso: filter.coso,
                         area: filter.area,
                         khoi: filter.khoi,
@@ -361,13 +365,14 @@ const addStudentToBin = () => {
         .map((item: any) => {
             return {
                 SOBAODANH: item['SO BAO DANH'],
-                HOVATEN: item['HOVARTEN'],
+                HOVATEN: item['HO VA TEN'],
                 DAPAN: item,
                 COSO: filter.coso,
                 AREA: filter.area,
                 KHOI: filter.khoi,
                 MON: filter.mon,
-                THUCCHIEN: filter.type,
+                CLASS: filter.lop,
+                MATHUCCHIEN: filter.de,
             }
         })
     $fetch('/api/bin/add', {
@@ -500,10 +505,11 @@ const addToHistory = async (student: any) => {
         const SBD = st.value['SO BAO DANH']
         const NGAY = today
         const MON = filter.mon
-        const DOT = filter.type
+        const LOP = filter.lop
         const KHUVUC = filter.area
         const COSO = filter.coso
         const KHOI = filter.khoi
+        const MATHUCCHIEN = filter.de
         return {
             SCORE,
             MADE,
@@ -511,8 +517,9 @@ const addToHistory = async (student: any) => {
             SBD,
             NGAY,
             MON,
-            DOT,
+            LOP,
             KHUVUC,
+            MATHUCCHIEN,
             COSO,
             KHOI,
         }
@@ -780,13 +787,17 @@ const sendEmailEarch = async () => {
                 <UFormGroup label="Môn" name="mon" eager-validation required>
                     <USelect v-model="filter.mon" :options="mon" placeholder="Môn" class="w-40" />
                 </UFormGroup>
-                <UFormGroup label="Lớp" name="type" eager-validation required>
+                <UFormGroup label="Lớp" name="lop" eager-validation required>
                     <USelect
                         :options="thucchien"
                         placeholder="Lớp"
                         class="w-40"
-                        v-model="filter.type"
+                        v-model="filter.lop"
                     />
+                </UFormGroup>
+
+                <UFormGroup label="Mã đề thực chiến (IN HOA)" name="de" eager-validation required>
+                    <UInput placeholder="Mã Đề" class="w-40" v-model="filter.de" />
                 </UFormGroup>
 
                 <UButton type="submit" class="h-fit mt-6" :loading="state.loading"

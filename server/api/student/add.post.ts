@@ -10,6 +10,7 @@ async function addStudent(docs: any[]): Promise<any[]> {
                 (existingStudent) =>
                     existingStudent.SBD === doc.SBD &&
                     existingStudent.CLASS === doc.CLASS &&
+                    existingStudent.KHOI === doc.KHOI &&
                     existingStudent.MON === doc.MON &&
                     existingStudent.AREA === doc.AREA
             )

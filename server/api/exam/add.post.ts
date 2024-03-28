@@ -6,15 +6,15 @@ export default defineEventHandler(async (event) => {
     const newExam = {
         code: payload.code,
         excercies: payload.excercies,
-        subject: payload.subject,
-        type: payload.type,
+        mon: payload.mon,
+        de: payload.de,
         khoi: payload.khoi,
     }
     try {
         const existed = await Exam.findOne({
             code: newExam.code,
-            subject: payload.subject,
-            type: payload.type,
+            mon: payload.mon,
+            de: payload.de,
             khoi: payload.khoi,
         })
         if (existed?.code) {

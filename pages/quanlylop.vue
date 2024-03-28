@@ -74,6 +74,7 @@ async function onDelete({ AREA, COSO, KHOI, CLASS }: any) {
             toast.add({ title: 'Đã xóa', timeout: 3000 })
             isEdit.value = false
             Object.assign(form, {})
+            getClass({ COSO, AREA })
         })
         .catch(() => {
             toast.add({

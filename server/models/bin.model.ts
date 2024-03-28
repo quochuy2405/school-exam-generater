@@ -8,7 +8,8 @@ const BinSchema = new Schema({
     AREA: String,
     KHOI: String,
     MON: String,
-    THUCCHIEN: String,
+    CLASS: String,
+    MATHUCCHIEN: String,
 })
 
 export const Bin = model('Bin', BinSchema)

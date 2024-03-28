@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { thucchien } from '@/constants/options'
-import { z } from 'zod'
+import { z } from 'zod';
 
 definePageMeta({
     layout: 'slot',
@@ -32,8 +31,8 @@ const columns = [
         class: 'min-w-[100px]',
     },
     {
-        key: 'type',
-        label: 'Số thực chiến',
+        key: 'de',
+        label: 'Mã đề thực chiến',
         sortable: true,
         class: 'min-w-[60px]',
     },
@@ -46,7 +45,7 @@ const items = (row: any) => [
             icon: 'i-heroicons-pencil-square-20-solid',
             click: () => {
                 navigation.push({
-                    path: `/quanlydapan/${router.params.slug}/${row.code}/${row.khoi}/${row.type}`,
+                    path: `/quanlydapan/${router.params.slug}/${row.code}/${row.khoi}/${row.de}`,
                 })
             },
         },
@@ -56,7 +55,7 @@ const items = (row: any) => [
 const state = reactive({
     code: '',
     loading: false,
-    type: '',
+    de: '',
     khoi: '',
     exams: [] as any,
 })
@@ -73,8 +72,8 @@ const schema = z.object({
     khoi: z.string({
         required_error: 'Vui lòng chọn khối',
     }),
-    type: z.string({
-        required_error: 'Vui lòng chọn số thực chiến',
+    de: z.string({
+        required_error: 'Vui lòng chọn mã đề thực chiến',
     }),
 })
 const validate = (state: any): any[] => {
@@ -85,8 +84,8 @@ const validate = (state: any): any[] => {
     if (!state.khoi) {
         errors.push({ path: 'khoi', message: 'Vui lòng chọn khối' })
     }
-    if (!state.type) {
-        errors.push({ path: 'type', message: 'Vui lòng chọn số thực chiến' })
+    if (!state.de) {
+        errors.push({ path: 'de', message: 'Vui lòng chọn mã đề thực chiến' })
     }
 
     return errors
@@ -97,9 +96,9 @@ async function onSubmit(event: any) {
     state.loading = true
     const body = {
         code: event.data.code,
-        type: event.data.type,
+        de: event.data.de,
         khoi: event.data.khoi,
-        subject: router.params.slug,
+        mon: router.params.slug,
     }
     $fetch('/api/exam/find', { method: 'POST', body })
         .then((response: any) => {
@@ -120,9 +119,9 @@ async function onSubmit(event: any) {
 }
 const getAll = () => {
     state.code = ''
-    state.type = ''
+    state.de = ''
     const body = {
-        subject: router.params.slug,
+        mon: router.params.slug,
     }
 
     $fetch('/api/exam/all', { method: 'POST', body })
@@ -165,12 +164,12 @@ onMounted(() => {
                                 :options="[9, 12]"
                             />
                         </UFormGroup>
-                        <UFormGroup label="Số thực chiến" name="type" eager-validation required>
-                            <USelect
-                                class="min-w-[160px]"
-                                v-model="state.type"
-                                placeholder="Chọn số thực chiến"
-                                :options="thucchien"
+                        <UFormGroup label="Mã đề thực chiến (IN HOA)"  name="de" eager-validation required>
+                            <UInput
+                                class="min-w-[160px] w-[200px]"
+                                v-model="state.de"
+                                placeholder="Mã đề thực chiến"
+                            
                             />
                         </UFormGroup>
                         <UButton @click="getAll" class="h-fit mt-6 w-fit px-2">Bỏ lọc</UButton>

@@ -12,7 +12,8 @@ async function addStudent(docs: any[]): Promise<any[]> {
                     existingStudent.HOVATEN === doc.HOVATEN &&
                     existingStudent.MON === doc.MON &&
                     existingStudent.AREA === doc.AREA &&
-                    existingStudent.THUCCHIEN === doc.THUCCHIEN
+                    existingStudent.CLASS === doc.CLASS &&
+                    existingStudent.MATHUCCHIEN === doc.MATHUCCHIEN
             )
 
             // Nếu không tìm thấy sinh viên nào trong cơ sở dữ liệu có cùng SBD và class, sinh viên mới này là hợp lệ

@@ -6,9 +6,10 @@ export default defineEventHandler(async (event) => {
     const MON = payload.MON
     const AREA = payload.AREA
     const CLASS = payload.CLASS
+    const KHOI = payload.KHOI
     const COSO = payload.COSO
 
-    const student = await Student.deleteOne({ SBD, MON, AREA, CLASS, COSO })
+    const student = await Student.deleteOne({ SBD, MON, KHOI, AREA, CLASS, COSO })
 
     if (!student.deletedCount) {
         return setResponseStatus(event, 404, 'Not deletedCount')

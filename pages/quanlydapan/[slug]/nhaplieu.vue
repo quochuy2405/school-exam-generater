@@ -46,7 +46,7 @@ const router = useRoute()
 const state = reactive({
     code: undefined,
     class: undefined,
-    type: undefined,
+    de: undefined,
     khoi: undefined,
     file: undefined,
     excercies: [] as any,
@@ -72,8 +72,8 @@ const rows = computed(() => {
 })
 const schema = z.object({
     code: z.string().min(3, 'Phải nhiều hơn 3 ký tự'),
-    type: z.string({
-        required_error: 'Vui lòng chọn số thực chiến',
+    de: z.string({
+        required_error: 'Vui lòng nhập mã đề thực chiến',
     }),
     khoi: z.string({
         required_error: 'Vui lòng chọn khối',
@@ -113,9 +113,9 @@ async function onSubmit(event: any) {
 
     const dataCreate = {
         code: event.data.code,
-        type: event.data.type,
+        de: event.data.de,
         khoi: event.data.khoi,
-        subject: router.params.slug,
+        mon: router.params.slug,
         excercies: { ...event.data.excercies },
     }
     $fetch('/api/exam/add', {
@@ -179,12 +179,8 @@ async function onSubmit(event: any) {
                         <UFormGroup label="Mã đề" name="code" eager-validation required>
                             <UInput v-model="state.code" placeholder="Nhập mã đề" />
                         </UFormGroup>
-                        <UFormGroup label="Số thực chiến" name="type" eager-validation required>
-                            <USelect
-                                v-model="state.type"
-                                placeholder="Chọn số thực chiến"
-                                :options="thucchien"
-                            />
+                        <UFormGroup label="Mã đề thực chiến (IN HOA)" name="de"  eager-validation required>
+                            <UInput v-model="state.de" placeholder="Mã đề thực chiến" />
                         </UFormGroup>
                         <UFormGroup label="Khối" name="khoi" eager-validation required>
                             <USelect
